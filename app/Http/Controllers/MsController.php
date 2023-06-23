@@ -72,6 +72,22 @@ class MsController extends Controller
                 'ms_team_id' => $ms_team_id,
             ]);
         } catch (Exception $e) {
+            //ทำอีกครั้งถ้า error แต่ get Access Token อีกครั้ง
+            $access_token = $this->getAccessToken();
+            $response = Http::withToken($access_token)->post('https://graph.microsoft.com/v1.0/teams', [
+                "template@odata.bind" => "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
+                "displayName" => $team_name,
+                "description" => $description,
+            ]);
+
+            $result = $response->headers();
+            $ms_team_id = $result['Content-Location'][0];
+            $ms_team_id = str_replace("/teams('", "", $ms_team_id);
+            $ms_team_id = str_replace("')", "", $ms_team_id);
+
+            DB::table('sections')->where('section', '=', $section_id)->update([
+                'ms_team_id' => $ms_team_id,
+            ]);
         }
     }
 
