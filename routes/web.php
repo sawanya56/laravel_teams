@@ -21,6 +21,7 @@ Route::get('/', function () {
 });
 
 // Route::get('test','TestController@');
+Route::get('team/token',[MsController::class,'getAccessToken']);
 Route::get('team/create',[MsController::class,'processQueueCreateTeam']);
 Route::get('team/delete',[MsController::class,'deleteAllGroup']);
 Route::get('/team/student/add',[MsController::class,'AddStudent']);
