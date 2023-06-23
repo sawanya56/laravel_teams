@@ -21,7 +21,7 @@ Route::get('/', function () {
 });
 
 // Route::get('test','TestController@');
-Route::get('team/create',[MsController::class,'CreateTeams']);
+Route::get('team/create',[MsController::class,'processQueueCreateTeam']);
 Route::get('team/delete',[MsController::class,'deleteAllGroup']);
 Route::get('/team/student/add',[MsController::class,'AddStudent']);
 Route::get('/team/instructor/add',[MsController::class,'AddInstructor']);

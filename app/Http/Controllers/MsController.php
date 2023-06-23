@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CreateTeam;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -35,31 +36,22 @@ class MsController extends Controller
         }
     }
 
-    public function CreateTeams()
+    public function CreateTeams($team_name, $section_id, $description)
     {
-        $sections = DB::table('view_sections')->limit(1)->get();
+        $response = Http::withToken($this->token)->post('https://graph.microsoft.com/v1.0/teams', [
+            "template@odata.bind" => "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
+            "displayName" => $team_name,
+            "description" => $description,
+        ]);
 
-        foreach ($sections as $section) {
+        $result = $response->headers();
+        $ms_team_id = $result['Content-Location'][0];
+        $ms_team_id = str_replace("/teams('", "", $ms_team_id);
+        $ms_team_id = str_replace("')", "", $ms_team_id);
 
-            $team_name = $section->team_name;
-            $section_id = $section->section;
-            $description = $section->description;
-            $response = Http::withToken($this->token)->post('https://graph.microsoft.com/v1.0/teams', [
-                "template@odata.bind" => "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
-                "displayName" => $team_name,
-                "description" => $description,
-            ]);
-
-            $result = $response->headers();
-            $ms_team_id = $result['Content-Location'][0];
-            $ms_team_id = str_replace("/teams('", "", $ms_team_id);
-            $ms_team_id = str_replace("')", "", $ms_team_id);
-
-            DB::table('sections')->where('section', '=', $section_id)->update([
-                'ms_team_id' => $ms_team_id,
-            ]);
-
-        }
+        DB::table('sections')->where('section', '=', $section_id)->update([
+            'ms_team_id' => $ms_team_id,
+        ]);
 
     }
 
@@ -150,6 +142,15 @@ class MsController extends Controller
     //----------------------------------------- QUEUE -----------------------------------------------//
     public function processQueueCreateTeam()
     {
-        
+        $sections = DB::table('view_sections')->get();
+
+        foreach ($sections as $section) {
+
+            $team_name = $section->team_name;
+            $section_id = $section->section;
+            $description = $section->description;
+
+            dispatch(new CreateTeam($team_name, $section_id, $description));
+        }
     }
 }

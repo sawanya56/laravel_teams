@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Http\Controllers\MsController;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -17,9 +16,15 @@ class CreateTeam implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    private $team_name;
+    private $section_id;
+    private $description;
+
+    public function __construct($team_name, $section_id, $description)
     {
-        //
+        $this->team_name = $team_name;
+        $this->section_id = $section_id;
+        $this->description = $description;
     }
 
     /**
@@ -28,6 +33,6 @@ class CreateTeam implements ShouldQueue
     public function handle(): void
     {
         $job = new MsController();
-        $job->CreateTeams();
+        $job->CreateTeams($this->team_name, $this->section_id, $this->description);
     }
 }
