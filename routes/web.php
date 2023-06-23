@@ -21,8 +21,10 @@ Route::get('/', function () {
 });
 
 // Route::get('test','TestController@');
-Route::get('main',[MsController::class,'main']);
-Route::get('student',[MsController::class,'AddStudent']);
+Route::get('team/create',[MsController::class,'CreateTeams']);
+Route::get('team/delete',[MsController::class,'deleteAllGroup']);
+Route::get('/team/student/add',[MsController::class,'AddStudent']);
+Route::get('/team/instructor/add',[MsController::class,'AddInstructor']);
 Route::get('instructor',[MsController::class,'AddInstructor']);
 Route::get('groupmail',[MsController::class,'getGroupmail']);
 
