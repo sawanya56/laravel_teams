@@ -260,11 +260,12 @@ class MsController extends Controller
     public function deleteAllGroup()
     {
         $sections = DB::table('view_sections')->whereNotNull('ms_team_id')->get();
+        $access_token = $this->getAccessTokenDatabase();
         foreach ($sections as $section) {
             $team_id = $section->ms_team_id;
             $section_id = $section->section;
             $end_point = "https://graph.microsoft.com/v1.0/groups/" . $team_id;
-            $response = Http::withToken($this->token)->delete($end_point);
+            $response = Http::withToken($access_token)->delete($end_point);
 
             DB::table('sections')->where('section', '=', $section_id)->update([
                 'ms_team_id' => null,
