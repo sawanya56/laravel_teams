@@ -250,6 +250,9 @@ class MsController extends Controller
                 ];
                 $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
                 $response = Http::withToken($access_token)->get($endpoint, $data);
+                $response_data = $response()->json();
+                $body_content = $response_data['body'];
+                $this->postMeetingToTeam($team_id, $channel_id, $body_content);
             }
         }
     }
@@ -269,9 +272,14 @@ class MsController extends Controller
         }
     }
 
-    public function postMeetingToTeam()
+    public function postMeetingToTeam($team_id, $channel_id, $body_content)
     {
-        
+        $access_token = $this->getAccessTokenDatabase();
+        $end_point = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/channels/" . $channel_id . "/messages";
+        $data = [
+            "body" => $body_content
+        ];
+        $response = Http::withToken($access_token)->post($end_point, $data);
     }
 
     //----------------------------------------- QUEUE -----------------------------------------------//
