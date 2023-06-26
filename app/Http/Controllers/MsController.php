@@ -202,7 +202,7 @@ class MsController extends Controller
             $section_id = $section->section;
             $group_mail = $this->getGroupmail($team_id, $section_id);
             $channel_id = $this->getChannel($team_id, $section_id);
-            $access_token = $this->getAccessTokenDatabase();
+            // $access_token = $this->getAccessTokenDatabase();
 
             // dd($group_mail,$channel_id,$access_token,$team_id);
             // $start_date_time = '2023-07-03T12:00:00';
@@ -213,6 +213,7 @@ class MsController extends Controller
             $class_infomation = DB::table('class')->where('section', '=', $section_id)->get();
             $days_of_week = [];
             foreach ($class_infomation as $row) {
+
                 $start_time = $row->start_time;
                 $dulation_time = $row->duration_time;
                 $study_time = $this->calculateEndTime($start_time, $dulation_time);
@@ -264,21 +265,28 @@ class MsController extends Controller
                             "endDate" => $end_date,
                         ],
                     ],
-
                 ];
 
+                //Check Meeting URL In Database
+                $meeting_url = DB::table('sections')->where('section', '=', $section_id)->whereNotNull('meeting_url')->first();
+                if ($meeting_url != null) {
+                    // unset($data['isOnlineMeeting']);
+                    // unset($data['onlineMeetingProvider']);
+                    $data['onlineMeetingUrl'] = $meeting_url->meeting_url;
+                }
+
                 // $token = $this->getAccessToken();
-                $token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6Ijk2ZV9JS2JDVFZHZGxiV1V6NEdjLWRBYkxGWUdzNjlwalhDT0ppRk5RSDAiLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgvIiwiaWF0IjoxNjg3NzgyNjA3LCJuYmYiOjE2ODc3ODI2MDcsImV4cCI6MTY4Nzc4Njk2NiwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFUUUF5LzhUQUFBQVJWclY4T01ITHdhVmpaZjhlMkxEVWY1dllGaEQ0bURIOVQxY0kzZnN0bDZMZG1oOFBYSFpoKzQ1b1Y3WmNwaDUiLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6IkdyYXBoIEV4cGxvcmVyIiwiYXBwaWQiOiJkZThiYzhiNS1kOWY5LTQ4YjEtYThhZC1iNzQ4ZGE3MjUwNjQiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IuC4geC4uOC4peC4muC4o-C4tOC4hOC4uOC4myIsImdpdmVuX25hbWUiOiLguJvguKPguLDguYDguKrguKPguLTguJAiLCJpZHR5cCI6InVzZXIiLCJpcGFkZHIiOiIyMjMuMjA0Ljg1LjQ0IiwibmFtZSI6IuC4m-C4o-C4sOC5gOC4quC4o-C4tOC4kCAg4LiB4Li44Lil4Lia4Lij4Li04LiE4Li44LibIiwib2lkIjoiYjZmNDQ2ZmUtODQyNi00MzgzLTk5ZjktODFhM2I0YjJmMDE5Iiwib25wcmVtX3NpZCI6IlMtMS01LTIxLTc5MDUyNTQ3OC0xMDc4MDgxNTMzLTgzOTUyMjExNS02ODk1MjYiLCJwbGF0ZiI6IjMiLCJwdWlkIjoiMTAwMzIwMDAzOTI0MjA0MCIsInJoIjoiMC5BVk1BT1VySGp2YmQ0VUd3b3Y4RVdlcU91QU1BQUFBQUFBQUF3QUFBQUFBQUFBQlRBT28uIiwic2NwIjoiQ2FsZW5kYXJzLlJlYWRXcml0ZSBDaGFubmVsLlJlYWRCYXNpYy5BbGwgQ2hhbm5lbE1lc3NhZ2UuU2VuZCBDaGF0LlJlYWQgQ2hhdC5SZWFkQmFzaWMgQ2hhdC5SZWFkV3JpdGUgQ2hhdE1lc3NhZ2UuU2VuZCBDb250YWN0cy5SZWFkV3JpdGUgRGV2aWNlTWFuYWdlbWVudFJCQUMuUmVhZC5BbGwgRGV2aWNlTWFuYWdlbWVudFNlcnZpY2VDb25maWcuUmVhZC5BbGwgRmlsZXMuUmVhZFdyaXRlLkFsbCBHcm91cC5SZWFkV3JpdGUuQWxsIElkZW50aXR5Umlza0V2ZW50LlJlYWQuQWxsIE1haWwuUmVhZCBNYWlsLlJlYWRXcml0ZSBNYWlsYm94U2V0dGluZ3MuUmVhZFdyaXRlIE5vdGVzLlJlYWRXcml0ZS5BbGwgb3BlbmlkIFBlb3BsZS5SZWFkIFBsYWNlLlJlYWQgUHJlc2VuY2UuUmVhZCBQcmVzZW5jZS5SZWFkLkFsbCBQcmludGVyU2hhcmUuUmVhZEJhc2ljLkFsbCBQcmludEpvYi5DcmVhdGUgUHJpbnRKb2IuUmVhZEJhc2ljIHByb2ZpbGUgUmVwb3J0cy5SZWFkLkFsbCBTaXRlcy5SZWFkV3JpdGUuQWxsIFRhc2tzLlJlYWRXcml0ZSBUZWFtLkNyZWF0ZSBUZWFtLlJlYWRCYXNpYy5BbGwgVXNlci5SZWFkIFVzZXIuUmVhZEJhc2ljLkFsbCBVc2VyLlJlYWRXcml0ZSBVc2VyLlJlYWRXcml0ZS5BbGwgZW1haWwiLCJzaWduaW5fc3RhdGUiOlsia21zaSJdLCJzdWIiOiJGOUVMWUJ6aUhVS2FxbVgyYTk5RU9nWVNleUcxR1JuOFZfTVZPb3R1UEg0IiwidGVuYW50X3JlZ2lvbl9zY29wZSI6IkFTIiwidGlkIjoiOGVjNzRhMzktZGRmNi00MWUxLWIwYTItZmYwNDU5ZWE4ZWI4IiwidW5pcXVlX25hbWUiOiJwcmFzZXJ0X2tiQG1qdS5hYy50aCIsInVwbiI6InByYXNlcnRfa2JAbWp1LmFjLnRoIiwidXRpIjoiZUJSLUV5VHBPMHF3VTZ4OHZqOG5BQSIsInZlciI6IjEuMCIsIndpZHMiOlsiYjc5ZmJmNGQtM2VmOS00Njg5LTgxNDMtNzZiMTk0ZTg1NTA5Il0sInhtc19jYyI6WyJDUDEiXSwieG1zX3NzbSI6IjEiLCJ4bXNfc3QiOnsic3ViIjoid2J6SkpRaTZpUVNlLWM4ZmhhNzZIbThncnMyejM2cGd6NWpLa2RvWm9aSSJ9LCJ4bXNfdGNkdCI6MTM5MzIxNDY5M30.FqSgAaZluv6tXwI7ninbNUYIYVUKe1YmfTQ9Kjzg2HR5yIYnjcgDYF_VQDnAqcAa0Z6sPlYEN98QuGgCDWiZsIAhD0uhASlXtHebSD09WpQ9og_K3zN4TG3jLdhph2_mqtLrapT52B-XW0cJImZGeYdSH3KuPdWev_XUh6sDpHL2FzDIDsrTnc3Vme-0QQM12irJLmNR476hly50AVC07W3D5mFTZU5TwRITUWvkE57wKZPSKqAHnONIuuahen-Q7j97lvdMmNy62kFiu4fvGwI6YYyyfakB9R1mGZtMRbxM-euJR_wtra_x48oAkeGa9J4lN5dDZQbXNaCsecfFNA';
+                $token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6Ik81N1BjZUwtTkQyVE80a1ZIMDYwcTFlNW5KdG5QT0hxVTdIV3plb0h2VzgiLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgvIiwiaWF0IjoxNjg3Nzg4MjE0LCJuYmYiOjE2ODc3ODgyMTQsImV4cCI6MTY4Nzc5Mjk3NywiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFUUUF5LzhUQUFBQVpkaEpBWk90L3hSRUFIL3V4UXhvWEdjaVhjaDQ2Q3ZWT2JaMUY3N3duVXVsT0Rmc1JCVXJ1Z1B5eGxJZGZzZmwiLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6IkdyYXBoIEV4cGxvcmVyIiwiYXBwaWQiOiJkZThiYzhiNS1kOWY5LTQ4YjEtYThhZC1iNzQ4ZGE3MjUwNjQiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IuC4geC4uOC4peC4muC4o-C4tOC4hOC4uOC4myIsImdpdmVuX25hbWUiOiLguJvguKPguLDguYDguKrguKPguLTguJAiLCJpZHR5cCI6InVzZXIiLCJpcGFkZHIiOiIxLjIwLjE0MS4xMzQiLCJuYW1lIjoi4Lib4Lij4Liw4LmA4Liq4Lij4Li04LiQICDguIHguLjguKXguJrguKPguLTguITguLjguJsiLCJvaWQiOiJiNmY0NDZmZS04NDI2LTQzODMtOTlmOS04MWEzYjRiMmYwMTkiLCJvbnByZW1fc2lkIjoiUy0xLTUtMjEtNzkwNTI1NDc4LTEwNzgwODE1MzMtODM5NTIyMTE1LTY4OTUyNiIsInBsYXRmIjoiMyIsInB1aWQiOiIxMDAzMjAwMDM5MjQyMDQwIiwicmgiOiIwLkFWTUFPVXJIanZiZDRVR3dvdjhFV2VxT3VBTUFBQUFBQUFBQXdBQUFBQUFBQUFCVEFPby4iLCJzY3AiOiJDYWxlbmRhcnMuUmVhZFdyaXRlIENoYW5uZWwuUmVhZEJhc2ljLkFsbCBDaGFubmVsTWVzc2FnZS5TZW5kIENoYXQuUmVhZCBDaGF0LlJlYWRCYXNpYyBDaGF0LlJlYWRXcml0ZSBDaGF0TWVzc2FnZS5TZW5kIENvbnRhY3RzLlJlYWRXcml0ZSBEZXZpY2VNYW5hZ2VtZW50UkJBQy5SZWFkLkFsbCBEZXZpY2VNYW5hZ2VtZW50U2VydmljZUNvbmZpZy5SZWFkLkFsbCBGaWxlcy5SZWFkV3JpdGUuQWxsIEdyb3VwLlJlYWRXcml0ZS5BbGwgSWRlbnRpdHlSaXNrRXZlbnQuUmVhZC5BbGwgTWFpbC5SZWFkIE1haWwuUmVhZFdyaXRlIE1haWxib3hTZXR0aW5ncy5SZWFkV3JpdGUgTm90ZXMuUmVhZFdyaXRlLkFsbCBvcGVuaWQgUGVvcGxlLlJlYWQgUGxhY2UuUmVhZCBQcmVzZW5jZS5SZWFkIFByZXNlbmNlLlJlYWQuQWxsIFByaW50ZXJTaGFyZS5SZWFkQmFzaWMuQWxsIFByaW50Sm9iLkNyZWF0ZSBQcmludEpvYi5SZWFkQmFzaWMgcHJvZmlsZSBSZXBvcnRzLlJlYWQuQWxsIFNpdGVzLlJlYWRXcml0ZS5BbGwgVGFza3MuUmVhZFdyaXRlIFRlYW0uQ3JlYXRlIFRlYW0uUmVhZEJhc2ljLkFsbCBVc2VyLlJlYWQgVXNlci5SZWFkQmFzaWMuQWxsIFVzZXIuUmVhZFdyaXRlIFVzZXIuUmVhZFdyaXRlLkFsbCBlbWFpbCIsInN1YiI6IkY5RUxZQnppSFVLYXFtWDJhOTlFT2dZU2V5RzFHUm44Vl9NVk9vdHVQSDQiLCJ0ZW5hbnRfcmVnaW9uX3Njb3BlIjoiQVMiLCJ0aWQiOiI4ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgiLCJ1bmlxdWVfbmFtZSI6InByYXNlcnRfa2JAbWp1LmFjLnRoIiwidXBuIjoicHJhc2VydF9rYkBtanUuYWMudGgiLCJ1dGkiOiIybVdnRGk2M0UwR0xEX0l5dGJFeEFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyJiNzlmYmY0ZC0zZWY5LTQ2ODktODE0My03NmIxOTRlODU1MDkiXSwieG1zX2NjIjpbIkNQMSJdLCJ4bXNfc3NtIjoiMSIsInhtc19zdCI6eyJzdWIiOiJ3YnpKSlFpNmlRU2UtYzhmaGE3NkhtOGdyczJ6MzZwZ3o1aktrZG9ab1pJIn0sInhtc190Y2R0IjoxMzkzMjE0NjkzfQ.DMbFkg4h5sSu3v76--z5icj7dqsC7OGE7gTUZgk-LzeS4F4hwSTUnD3sEyP4mOKrtOtSGIuvYfqfOTWAUCWIVWmPSYwIKU50ZQA0uB6y5JXb2eiuVeis5ZH0UjlO-fN1g6AsvXPRUSDjAc5AwFYoodXYsPbq4a-pvmqWD2_Mi7_1BpWPhMcgarxAODoLYCoq0rYwkGnRxtE_JwMn-XC31fkVApLZJzapUuJvjhvWykGTLRP2xZ1pUWwgpuCZpNRDNQyecpK72byyTA1fVDR0xJDuk8J_ScTH9clrXzDeOKRXn5e9cAVVxXTf0wtrgjacNLDzrJxcx6i2rjZU1MWWnA';
                 $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
+
                 $retuen = [
                     'data' => $data,
                     'end_point' => $endpoint
                 ];
-                // dd($endpoint);
+                // return response()->json($retuen, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
 
                 $response = Http::withToken($token)->post($endpoint, $data);
                 $response_data = $response->json();
-                // return response()->json($retuen, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
 
                 // dd($response,$response->json());
                 if (isset($response_data['error'])) {
@@ -287,18 +295,21 @@ class MsController extends Controller
                     //Create Success
                     // dd($response_data);
                     $event_id = $response['id'];
-                    $meeting_url = $response['onlineMeeting']['joinUrl'];
+                    if ($meeting_url == null) {
+                        $meeting_url = $response['onlineMeeting']['joinUrl'];
+                        DB::table('sections')->where('section', '=', $section_id)->update([
+                            'meeting_url' => $meeting_url,
+                        ]);
+                    }
                     $body_content = $response['body'];
                     // dd($section_id,$meeting_url,$event_id);
-                    DB::beginTransaction();
-                    DB::table('sections')->where('section', '=', $section_id)->update([
-                        'meeting_url' => $meeting_url,
-                    ]);
+                    // DB::beginTransaction();
+
 
                     DB::table('class')->where('id', '=', $row->id)->update([
                         'event_id' => $event_id,
                     ]);
-                    DB::commit();
+                    // DB::commit();
                     echo "Success";
                     // dd($event_id,$meeting_url ,$body_content);
                     // $this->postMeetingToTeam($team_id, $channel_id, $body_content);
