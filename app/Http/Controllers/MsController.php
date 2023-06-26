@@ -76,7 +76,7 @@ class MsController extends Controller
 
         $access_token = $this->getAccessTokenDatabase();
 
-        $owner_email = 'mju6204101356@mju.ac.th';
+        $owner_email = 'prasert_kb@mju.ac.th';
         try {
             $response = Http::withToken($access_token)->post('https://graph.microsoft.com/v1.0/teams', [
                 "template@odata.bind" => "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
@@ -208,7 +208,7 @@ class MsController extends Controller
             // $start_date_time = '2023-07-03T12:00:00';
             // $end_date_time = '2023-07-03T13:00:00';
             $start_date = '2023-07-03';
-            $end_date = '2023-08-30';
+            $end_date = '2023-07-30';
 
             $class_infomation = DB::table('class')->where('section', '=', $section_id)->get();
             $days_of_week = [];
@@ -229,11 +229,11 @@ class MsController extends Controller
                         "content" => $row->study_type,
                     ],
                     "start" => [
-                        "dateTime" => "2023-07-03T08:00:00",
+                        "dateTime" => $start_date_time,
                         "timeZone" => "Asia/Bangkok",
                     ],
                     "end" => [
-                        "dateTime" => "2023-07-03T19:00:00",
+                        "dateTime" => $end_date_time,
                         "timeZone" => "Asia/Bangkok",
                     ],
                     "location" => [
@@ -255,7 +255,7 @@ class MsController extends Controller
                             "type" => "weekly",
                             "interval" => 1,
                             "daysOfWeek" => [
-                                $days_of_week,
+                                $days_of_week
                             ],
                         ],
                         "range" => [
@@ -266,23 +266,26 @@ class MsController extends Controller
                     ],
 
                 ];
+
                 // $token = $this->getAccessToken();
-                $token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6InBJaDQ0UERjRmowWU56OG1DUEsxZU9BdHRHaEp5dEJVWTc5MjNoR0l5QU0iLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgvIiwiaWF0IjoxNjg3Nzc5MTYzLCJuYmYiOjE2ODc3NzkxNjMsImV4cCI6MTY4Nzc4MzU3NSwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFUUUF5LzhUQUFBQXM1S0xRNU0wUTNpdVVJRE5YYXNHUUUwZG5sS2wzVnU3WTZuSS9iaFNmNzg1dFR5OExDMmdNZ0tkQ0d5MWI2U2YiLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6IkdyYXBoIEV4cGxvcmVyIiwiYXBwaWQiOiJkZThiYzhiNS1kOWY5LTQ4YjEtYThhZC1iNzQ4ZGE3MjUwNjQiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IuC4geC4uOC4jeC4iuC4o-C4geC4tOC4leC4leC4tOC4hOC4uOC4kyIsImdpdmVuX25hbWUiOiI2MjA0MTAxMzU2IOC4quC4p-C4o-C4o-C4ouC4siIsImlkdHlwIjoidXNlciIsImlwYWRkciI6IjIwMi4yOC4zNy4xMSIsIm5hbWUiOiI2MjA0MTAxMzU2IOC4quC4p-C4o-C4o-C4ouC4siDguIHguLjguI3guIrguKPguIHguLTguJXguJXguLTguITguLjguJMiLCJvaWQiOiJkZjZhZWEwMi0xYTFkLTQ1N2YtOGRjYi04M2I0YzJiYTk5MzAiLCJvbnByZW1fc2lkIjoiUy0xLTUtMjEtNzkwNTI1NDc4LTEwNzgwODE1MzMtODM5NTIyMTE1LTY5NjI1NiIsInBsYXRmIjoiMyIsInB1aWQiOiIxMDAzMjAwMDRFMDY0QzNGIiwicmgiOiIwLkFWTUFPVXJIanZiZDRVR3dvdjhFV2VxT3VBTUFBQUFBQUFBQXdBQUFBQUFBQUFCVEFCby4iLCJzY3AiOiJDYWxlbmRhcnMuUmVhZFdyaXRlIENoYXQuUmVhZCBDaGF0LlJlYWRCYXNpYyBDb250YWN0cy5SZWFkV3JpdGUgRGV2aWNlTWFuYWdlbWVudFJCQUMuUmVhZC5BbGwgRGV2aWNlTWFuYWdlbWVudFNlcnZpY2VDb25maWcuUmVhZC5BbGwgRmlsZXMuUmVhZFdyaXRlLkFsbCBHcm91cC5SZWFkV3JpdGUuQWxsIElkZW50aXR5Umlza0V2ZW50LlJlYWQuQWxsIE1haWwuUmVhZCBNYWlsLlJlYWRXcml0ZSBNYWlsYm94U2V0dGluZ3MuUmVhZFdyaXRlIE5vdGVzLlJlYWRXcml0ZS5BbGwgb3BlbmlkIFBlb3BsZS5SZWFkIFBsYWNlLlJlYWQgUHJlc2VuY2UuUmVhZCBQcmVzZW5jZS5SZWFkLkFsbCBQcmludGVyU2hhcmUuUmVhZEJhc2ljLkFsbCBQcmludEpvYi5DcmVhdGUgUHJpbnRKb2IuUmVhZEJhc2ljIHByb2ZpbGUgUmVwb3J0cy5SZWFkLkFsbCBTaXRlcy5SZWFkV3JpdGUuQWxsIFRhc2tzLlJlYWRXcml0ZSBVc2VyLlJlYWQgVXNlci5SZWFkQmFzaWMuQWxsIFVzZXIuUmVhZFdyaXRlIFVzZXIuUmVhZFdyaXRlLkFsbCBlbWFpbCIsInN1YiI6IlR6R2lqazNvWUl3dVEtZG8xaFRrQjhRaVN6bURJYWtHNDY1Szl5RkNhY2siLCJ0ZW5hbnRfcmVnaW9uX3Njb3BlIjoiQVMiLCJ0aWQiOiI4ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgiLCJ1bmlxdWVfbmFtZSI6Ik1KVTYyMDQxMDEzNTZAbWp1LmFjLnRoIiwidXBuIjoiTUpVNjIwNDEwMTM1NkBtanUuYWMudGgiLCJ1dGkiOiJFbTBHamU4VVMwbTRQOGlqU2tBcUFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyJiNzlmYmY0ZC0zZWY5LTQ2ODktODE0My03NmIxOTRlODU1MDkiXSwieG1zX2NjIjpbIkNQMSJdLCJ4bXNfc3NtIjoiMSIsInhtc19zdCI6eyJzdWIiOiJTdkxwaUhjTlE4UDhrYkQ4N1NxQ3BTb3d2VENvUmprS0lLakxya01pN09JIn0sInhtc190Y2R0IjoxMzkzMjE0NjkzfQ.Pu6YyVb6TVdPakFdJe9wuveTGOW3pCLp9-Fb0qFPmra0KCyN9Kk25NyP-_xJYiTsrvch6XxKDtLxzK5yzP_Jx056Qkl5eNUrZib9snL_i3-_7Bfm_cxshrLQDTGuPa7rxH2h4AreLhdlJYfM98NZ_6AZokTl3sFr9jl01YFAhwcyZr28GB7o-iUZG26QrFRyeELEAUk8hmj35GaAax2hdR4rgfht4vVXxoFd_yplzbjKYO8jatvyDHXgEawMZ6A0FF1_nu8jM_ytClKfAomekUWCTmX2hcRQ3WF336t0W5vIw9_Ri9sIHMT3tRP_vAU61WnF6RH_QWnM_ZK1x-m3KA';
+                $token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6Ijk2ZV9JS2JDVFZHZGxiV1V6NEdjLWRBYkxGWUdzNjlwalhDT0ppRk5RSDAiLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgvIiwiaWF0IjoxNjg3NzgyNjA3LCJuYmYiOjE2ODc3ODI2MDcsImV4cCI6MTY4Nzc4Njk2NiwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFUUUF5LzhUQUFBQVJWclY4T01ITHdhVmpaZjhlMkxEVWY1dllGaEQ0bURIOVQxY0kzZnN0bDZMZG1oOFBYSFpoKzQ1b1Y3WmNwaDUiLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6IkdyYXBoIEV4cGxvcmVyIiwiYXBwaWQiOiJkZThiYzhiNS1kOWY5LTQ4YjEtYThhZC1iNzQ4ZGE3MjUwNjQiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IuC4geC4uOC4peC4muC4o-C4tOC4hOC4uOC4myIsImdpdmVuX25hbWUiOiLguJvguKPguLDguYDguKrguKPguLTguJAiLCJpZHR5cCI6InVzZXIiLCJpcGFkZHIiOiIyMjMuMjA0Ljg1LjQ0IiwibmFtZSI6IuC4m-C4o-C4sOC5gOC4quC4o-C4tOC4kCAg4LiB4Li44Lil4Lia4Lij4Li04LiE4Li44LibIiwib2lkIjoiYjZmNDQ2ZmUtODQyNi00MzgzLTk5ZjktODFhM2I0YjJmMDE5Iiwib25wcmVtX3NpZCI6IlMtMS01LTIxLTc5MDUyNTQ3OC0xMDc4MDgxNTMzLTgzOTUyMjExNS02ODk1MjYiLCJwbGF0ZiI6IjMiLCJwdWlkIjoiMTAwMzIwMDAzOTI0MjA0MCIsInJoIjoiMC5BVk1BT1VySGp2YmQ0VUd3b3Y4RVdlcU91QU1BQUFBQUFBQUF3QUFBQUFBQUFBQlRBT28uIiwic2NwIjoiQ2FsZW5kYXJzLlJlYWRXcml0ZSBDaGFubmVsLlJlYWRCYXNpYy5BbGwgQ2hhbm5lbE1lc3NhZ2UuU2VuZCBDaGF0LlJlYWQgQ2hhdC5SZWFkQmFzaWMgQ2hhdC5SZWFkV3JpdGUgQ2hhdE1lc3NhZ2UuU2VuZCBDb250YWN0cy5SZWFkV3JpdGUgRGV2aWNlTWFuYWdlbWVudFJCQUMuUmVhZC5BbGwgRGV2aWNlTWFuYWdlbWVudFNlcnZpY2VDb25maWcuUmVhZC5BbGwgRmlsZXMuUmVhZFdyaXRlLkFsbCBHcm91cC5SZWFkV3JpdGUuQWxsIElkZW50aXR5Umlza0V2ZW50LlJlYWQuQWxsIE1haWwuUmVhZCBNYWlsLlJlYWRXcml0ZSBNYWlsYm94U2V0dGluZ3MuUmVhZFdyaXRlIE5vdGVzLlJlYWRXcml0ZS5BbGwgb3BlbmlkIFBlb3BsZS5SZWFkIFBsYWNlLlJlYWQgUHJlc2VuY2UuUmVhZCBQcmVzZW5jZS5SZWFkLkFsbCBQcmludGVyU2hhcmUuUmVhZEJhc2ljLkFsbCBQcmludEpvYi5DcmVhdGUgUHJpbnRKb2IuUmVhZEJhc2ljIHByb2ZpbGUgUmVwb3J0cy5SZWFkLkFsbCBTaXRlcy5SZWFkV3JpdGUuQWxsIFRhc2tzLlJlYWRXcml0ZSBUZWFtLkNyZWF0ZSBUZWFtLlJlYWRCYXNpYy5BbGwgVXNlci5SZWFkIFVzZXIuUmVhZEJhc2ljLkFsbCBVc2VyLlJlYWRXcml0ZSBVc2VyLlJlYWRXcml0ZS5BbGwgZW1haWwiLCJzaWduaW5fc3RhdGUiOlsia21zaSJdLCJzdWIiOiJGOUVMWUJ6aUhVS2FxbVgyYTk5RU9nWVNleUcxR1JuOFZfTVZPb3R1UEg0IiwidGVuYW50X3JlZ2lvbl9zY29wZSI6IkFTIiwidGlkIjoiOGVjNzRhMzktZGRmNi00MWUxLWIwYTItZmYwNDU5ZWE4ZWI4IiwidW5pcXVlX25hbWUiOiJwcmFzZXJ0X2tiQG1qdS5hYy50aCIsInVwbiI6InByYXNlcnRfa2JAbWp1LmFjLnRoIiwidXRpIjoiZUJSLUV5VHBPMHF3VTZ4OHZqOG5BQSIsInZlciI6IjEuMCIsIndpZHMiOlsiYjc5ZmJmNGQtM2VmOS00Njg5LTgxNDMtNzZiMTk0ZTg1NTA5Il0sInhtc19jYyI6WyJDUDEiXSwieG1zX3NzbSI6IjEiLCJ4bXNfc3QiOnsic3ViIjoid2J6SkpRaTZpUVNlLWM4ZmhhNzZIbThncnMyejM2cGd6NWpLa2RvWm9aSSJ9LCJ4bXNfdGNkdCI6MTM5MzIxNDY5M30.FqSgAaZluv6tXwI7ninbNUYIYVUKe1YmfTQ9Kjzg2HR5yIYnjcgDYF_VQDnAqcAa0Z6sPlYEN98QuGgCDWiZsIAhD0uhASlXtHebSD09WpQ9og_K3zN4TG3jLdhph2_mqtLrapT52B-XW0cJImZGeYdSH3KuPdWev_XUh6sDpHL2FzDIDsrTnc3Vme-0QQM12irJLmNR476hly50AVC07W3D5mFTZU5TwRITUWvkE57wKZPSKqAHnONIuuahen-Q7j97lvdMmNy62kFiu4fvGwI6YYyyfakB9R1mGZtMRbxM-euJR_wtra_x48oAkeGa9J4lN5dDZQbXNaCsecfFNA';
                 $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
+                $retuen = [
+                    'data' => $data,
+                    'end_point' => $endpoint
+                ];
                 // dd($endpoint);
-                // return response()->json($data, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'],
-                //     JSON_UNESCAPED_UNICODE);
-               
-                $response = Http::withToken($token)->get($endpoint, $data);
+
+                $response = Http::withToken($token)->post($endpoint, $data);
                 $response_data = $response->json();
+                // return response()->json($retuen, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
 
                 // dd($response,$response->json());
                 if (isset($response_data['error'])) {
-                    dd($response_data);
+                    dd($response);
                 } else {
                     //Create Success
                     // dd($response_data);
-                    $response = $response_data['value'][0];
                     $event_id = $response['id'];
                     $meeting_url = $response['onlineMeeting']['joinUrl'];
                     $body_content = $response['body'];
@@ -296,8 +299,9 @@ class MsController extends Controller
                         'event_id' => $event_id,
                     ]);
                     DB::commit();
+                    echo "Success";
                     // dd($event_id,$meeting_url ,$body_content);
-                    $this->postMeetingToTeam($team_id, $channel_id, $body_content);
+                    // $this->postMeetingToTeam($team_id, $channel_id, $body_content);
                 }
             }
         }
