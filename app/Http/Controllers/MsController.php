@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\CreateTeam;
+use App\Jobs\DeleteAllTeam;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -195,7 +195,7 @@ class MsController extends Controller
 
     public function CreateEvent()
     {
-        $sections = DB::table('view_sections')->where('section','=', '336028')->get();
+        $sections = DB::table('view_sections')->where('section', '=', '336028')->get();
         // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
         foreach ($sections as $section) {
             $team_id = $section->ms_team_id;
@@ -205,10 +205,10 @@ class MsController extends Controller
             $access_token = $this->getAccessTokenDatabase();
 
             // dd($group_mail,$channel_id,$access_token,$team_id);
-            $start_date_time = '2023-07-03T12:00:00';
-            $end_date_time = '2023-07-03T13:00:00';
+            // $start_date_time = '2023-07-03T12:00:00';
+            // $end_date_time = '2023-07-03T13:00:00';
             $start_date = '2023-07-03';
-            $end_date = '2023-07-30';
+            $end_date = '2023-08-30';
 
             $class_infomation = DB::table('class')->where('section', '=', $section_id)->get();
             $days_of_week = [];
@@ -217,7 +217,7 @@ class MsController extends Controller
                 $dulation_time = $row->duration_time;
                 $study_time = $this->calculateEndTime($start_time, $dulation_time);
                 $start_date_time = $start_date . 'T' . $study_time['start_time'];
-                $end_date_time = $end_date . 'T' . $study_time['end_time'];
+                $end_date_time = $start_date . 'T' . $study_time['end_time'];
                 // dd($row);
                 $day = strtoupper($row->week_of_day);
                 $days_of_week = $this->week_of_day[$day];
@@ -229,11 +229,11 @@ class MsController extends Controller
                         "content" => $row->study_type,
                     ],
                     "start" => [
-                        "dateTime" => $start_date_time,
+                        "dateTime" => "2023-07-03T08:00:00",
                         "timeZone" => "Asia/Bangkok",
                     ],
                     "end" => [
-                        "dateTime" => $end_date_time,
+                        "dateTime" => "2023-07-03T19:00:00",
                         "timeZone" => "Asia/Bangkok",
                     ],
                     "location" => [
@@ -249,7 +249,7 @@ class MsController extends Controller
                         ],
                     ],
                     "isOnlineMeeting" => true,
-                    "onlineMeetingProvider" > "teamsForBusiness",
+                    "onlineMeetingProvider" => "teamsForBusiness",
                     "recurrence" => [
                         "pattern" => [
                             "type" => "weekly",
@@ -266,33 +266,62 @@ class MsController extends Controller
                     ],
 
                 ];
-                $token = $this->getAccessToken();
+                // $token = $this->getAccessToken();
+                $token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6InBJaDQ0UERjRmowWU56OG1DUEsxZU9BdHRHaEp5dEJVWTc5MjNoR0l5QU0iLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgvIiwiaWF0IjoxNjg3Nzc5MTYzLCJuYmYiOjE2ODc3NzkxNjMsImV4cCI6MTY4Nzc4MzU3NSwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFUUUF5LzhUQUFBQXM1S0xRNU0wUTNpdVVJRE5YYXNHUUUwZG5sS2wzVnU3WTZuSS9iaFNmNzg1dFR5OExDMmdNZ0tkQ0d5MWI2U2YiLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6IkdyYXBoIEV4cGxvcmVyIiwiYXBwaWQiOiJkZThiYzhiNS1kOWY5LTQ4YjEtYThhZC1iNzQ4ZGE3MjUwNjQiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IuC4geC4uOC4jeC4iuC4o-C4geC4tOC4leC4leC4tOC4hOC4uOC4kyIsImdpdmVuX25hbWUiOiI2MjA0MTAxMzU2IOC4quC4p-C4o-C4o-C4ouC4siIsImlkdHlwIjoidXNlciIsImlwYWRkciI6IjIwMi4yOC4zNy4xMSIsIm5hbWUiOiI2MjA0MTAxMzU2IOC4quC4p-C4o-C4o-C4ouC4siDguIHguLjguI3guIrguKPguIHguLTguJXguJXguLTguITguLjguJMiLCJvaWQiOiJkZjZhZWEwMi0xYTFkLTQ1N2YtOGRjYi04M2I0YzJiYTk5MzAiLCJvbnByZW1fc2lkIjoiUy0xLTUtMjEtNzkwNTI1NDc4LTEwNzgwODE1MzMtODM5NTIyMTE1LTY5NjI1NiIsInBsYXRmIjoiMyIsInB1aWQiOiIxMDAzMjAwMDRFMDY0QzNGIiwicmgiOiIwLkFWTUFPVXJIanZiZDRVR3dvdjhFV2VxT3VBTUFBQUFBQUFBQXdBQUFBQUFBQUFCVEFCby4iLCJzY3AiOiJDYWxlbmRhcnMuUmVhZFdyaXRlIENoYXQuUmVhZCBDaGF0LlJlYWRCYXNpYyBDb250YWN0cy5SZWFkV3JpdGUgRGV2aWNlTWFuYWdlbWVudFJCQUMuUmVhZC5BbGwgRGV2aWNlTWFuYWdlbWVudFNlcnZpY2VDb25maWcuUmVhZC5BbGwgRmlsZXMuUmVhZFdyaXRlLkFsbCBHcm91cC5SZWFkV3JpdGUuQWxsIElkZW50aXR5Umlza0V2ZW50LlJlYWQuQWxsIE1haWwuUmVhZCBNYWlsLlJlYWRXcml0ZSBNYWlsYm94U2V0dGluZ3MuUmVhZFdyaXRlIE5vdGVzLlJlYWRXcml0ZS5BbGwgb3BlbmlkIFBlb3BsZS5SZWFkIFBsYWNlLlJlYWQgUHJlc2VuY2UuUmVhZCBQcmVzZW5jZS5SZWFkLkFsbCBQcmludGVyU2hhcmUuUmVhZEJhc2ljLkFsbCBQcmludEpvYi5DcmVhdGUgUHJpbnRKb2IuUmVhZEJhc2ljIHByb2ZpbGUgUmVwb3J0cy5SZWFkLkFsbCBTaXRlcy5SZWFkV3JpdGUuQWxsIFRhc2tzLlJlYWRXcml0ZSBVc2VyLlJlYWQgVXNlci5SZWFkQmFzaWMuQWxsIFVzZXIuUmVhZFdyaXRlIFVzZXIuUmVhZFdyaXRlLkFsbCBlbWFpbCIsInN1YiI6IlR6R2lqazNvWUl3dVEtZG8xaFRrQjhRaVN6bURJYWtHNDY1Szl5RkNhY2siLCJ0ZW5hbnRfcmVnaW9uX3Njb3BlIjoiQVMiLCJ0aWQiOiI4ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgiLCJ1bmlxdWVfbmFtZSI6Ik1KVTYyMDQxMDEzNTZAbWp1LmFjLnRoIiwidXBuIjoiTUpVNjIwNDEwMTM1NkBtanUuYWMudGgiLCJ1dGkiOiJFbTBHamU4VVMwbTRQOGlqU2tBcUFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyJiNzlmYmY0ZC0zZWY5LTQ2ODktODE0My03NmIxOTRlODU1MDkiXSwieG1zX2NjIjpbIkNQMSJdLCJ4bXNfc3NtIjoiMSIsInhtc19zdCI6eyJzdWIiOiJTdkxwaUhjTlE4UDhrYkQ4N1NxQ3BTb3d2VENvUmprS0lLakxya01pN09JIn0sInhtc190Y2R0IjoxMzkzMjE0NjkzfQ.Pu6YyVb6TVdPakFdJe9wuveTGOW3pCLp9-Fb0qFPmra0KCyN9Kk25NyP-_xJYiTsrvch6XxKDtLxzK5yzP_Jx056Qkl5eNUrZib9snL_i3-_7Bfm_cxshrLQDTGuPa7rxH2h4AreLhdlJYfM98NZ_6AZokTl3sFr9jl01YFAhwcyZr28GB7o-iUZG26QrFRyeELEAUk8hmj35GaAax2hdR4rgfht4vVXxoFd_yplzbjKYO8jatvyDHXgEawMZ6A0FF1_nu8jM_ytClKfAomekUWCTmX2hcRQ3WF336t0W5vIw9_Ri9sIHMT3tRP_vAU61WnF6RH_QWnM_ZK1x-m3KA';
                 $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
+                // dd($endpoint);
+                // return response()->json($data, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'],
+                //     JSON_UNESCAPED_UNICODE);
+               
                 $response = Http::withToken($token)->get($endpoint, $data);
-                // return response()->json($endpoint, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'],
-                // JSON_UNESCAPED_UNICODE);
-                // dd($response->json(),$data);
                 $response_data = $response->json();
-                dd($response_data);
-                $body_content = $response_data['body'];
-                $this->postMeetingToTeam($team_id, $channel_id, $body_content);
+
+                // dd($response,$response->json());
+                if (isset($response_data['error'])) {
+                    dd($response_data);
+                } else {
+                    //Create Success
+                    // dd($response_data);
+                    $response = $response_data['value'][0];
+                    $event_id = $response['id'];
+                    $meeting_url = $response['onlineMeeting']['joinUrl'];
+                    $body_content = $response['body'];
+                    // dd($section_id,$meeting_url,$event_id);
+                    DB::beginTransaction();
+                    DB::table('sections')->where('section', '=', $section_id)->update([
+                        'meeting_url' => $meeting_url,
+                    ]);
+
+                    DB::table('class')->where('id', '=', $row->id)->update([
+                        'event_id' => $event_id,
+                    ]);
+                    DB::commit();
+                    // dd($event_id,$meeting_url ,$body_content);
+                    $this->postMeetingToTeam($team_id, $channel_id, $body_content);
+                }
             }
         }
     }
 
-    public function deleteAllGroup()
+    public function deleteAllGroup($team_id, $section_id, $access_token)
+    {
+        // $access_token = $this->getAccessToken();
+        $end_point = "https://graph.microsoft.com/v1.0/groups/" . $team_id;
+        $response = Http::withToken($access_token)->delete($end_point);
+
+        DB::beginTransaction();
+        DB::table('sections')->where('section', '=', $section_id)->update([
+            'ms_team_id' => null,
+        ]);
+        DB::commit();
+    }
+
+    public function processQueueDeleteAllTeam()
     {
         $sections = DB::table('view_sections')->whereNotNull('ms_team_id')->get();
-        $access_token = $this->getAccessTokenDatabase();
+        $access_token = $this->getAccessToken();
         foreach ($sections as $section) {
-            $team_id = $section->ms_team_id;
-            $section_id = $section->section;
-            $end_point = "https://graph.microsoft.com/v1.0/groups/" . $team_id;
-            $response = Http::withToken($access_token)->delete($end_point);
-
-            DB::table('sections')->where('section', '=', $section_id)->update([
-                'ms_team_id' => null,
-            ]);
+            dispatch(new DeleteAllTeam($section->section, $section->ms_team_id, $access_token));
         }
     }
 
@@ -310,15 +339,15 @@ class MsController extends Controller
     public function processQueueCreateTeam()
     {
         // $sections = DB::table('view_sections')->whereNull('ms_team_id')->limit(1)->get();
-        $sections = DB::table('view_sections')->whereNull('ms_team_id')->get();
-// dd($sections);
+        $sections = DB::table('view_sections')->where('section', '=', '336028')->get();
+
         foreach ($sections as $section) {
 
             $team_name = $section->team_name;
             $section_id = $section->section;
             $description = $section->description;
 
-            // $this->createTeams($team_name, $section_id, $description);
+            $this->createTeams($team_name, $section_id, $description);
             // echo "Create Team";
             // $this->AddStudent();
             // echo "Add Student";
@@ -326,7 +355,7 @@ class MsController extends Controller
             // echo "AddInstructor";
             // $this->CreateEvent();
             // echo "Create Event";
-            dispatch(new CreateTeam($team_name, $section_id, $description));
+            // dispatch(new CreateTeam($team_name, $section_id, $description));
         }
     }
 
