@@ -32,5 +32,5 @@ Route::get('groupmail',[MsController::class,'getGroupmail']);
 
 
 Route::get('team/delete',[MsController::class,'deleteAllGroup']);
-Route::get('test',[MsController::class,'processQueueCreateTeam']);
+Route::get('test',[MsController::class,'CreateEvent']);
 

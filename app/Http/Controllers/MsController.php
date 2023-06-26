@@ -20,7 +20,6 @@ class MsController extends Controller
         'SA' => "saturday",
         'SU' => "sunday",
 
-
     ];
 
     public function getAccessToken()
@@ -36,7 +35,7 @@ class MsController extends Controller
             'client_id' => $clientId,
             'client_secret' => $clientSecret,
             'grant_type' => 'client_credentials',
-            'resource' => 'https://graph.microsoft.com'
+            'resource' => 'https://graph.microsoft.com',
         ];
 
         $ch = curl_init($tokenEndpoint);
@@ -52,7 +51,7 @@ class MsController extends Controller
         $now = new DateTime();
         DB::table('settings')->insert([
             'access_token' => $tokenData['access_token'],
-            'created_at' => $now->format('Y-m-d H:i:s')
+            'created_at' => $now->format('Y-m-d H:i:s'),
         ]);
 
         return $tokenData['access_token'];
@@ -60,7 +59,7 @@ class MsController extends Controller
 
     public function getAccessTokenDatabase()
     {
-        return $access_token = $this->getAccessToken();
+        return $this->getAccessToken();
         $model = DB::table('settings')->orderBy('id', 'desc')->first();
         $access_token = null;
         if ($model == null) {
@@ -77,7 +76,7 @@ class MsController extends Controller
 
         $access_token = $this->getAccessTokenDatabase();
 
-        $owner_email = 'prasert_kb@mju.ac.th';
+        $owner_email = 'mju6204101356@mju.ac.th';
         try {
             $response = Http::withToken($access_token)->post('https://graph.microsoft.com/v1.0/teams', [
                 "template@odata.bind" => "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
@@ -87,9 +86,9 @@ class MsController extends Controller
                     [
                         "@odata.type" => "#microsoft.graph.aadUserConversationMember",
                         "roles" => ["owner"],
-                        "user@odata.bind" => "https://graph.microsoft.com/v1.0/users/" . $owner_email
-                    ]
-                ]
+                        "user@odata.bind" => "https://graph.microsoft.com/v1.0/users/" . $owner_email,
+                    ],
+                ],
             ]);
 
             $result = $response->headers();
@@ -108,16 +107,15 @@ class MsController extends Controller
     public function AddStudent()
     {
 
-
         // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_student')->get();
-        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->where('section', '=', '336723')->get();
+        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereIn('section', ['333083', '335260'])->get();
         foreach ($sections as $section) {
             $section_id = $section->section;
             $team_id = $section->ms_team_id;
 
             $students = DB::table('enrollments')->where('section', '=', $section_id)->get();
             $access_token = $this->getAccessTokenDatabase();
-            
+
             foreach ($students as $student) {
                 $student_mail = $student->student_mail;
                 //CALL API TEAM
@@ -133,7 +131,7 @@ class MsController extends Controller
                 //END CALL API
             }
             DB::table('sections')->where('section', '=', $section->section)->update([
-                'add_student' => 'success'
+                'add_student' => 'success',
             ]);
         }
     }
@@ -143,7 +141,7 @@ class MsController extends Controller
         $access_token = $this->getAccessTokenDatabase();
         // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->get();
         // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_instructor')->get();
-        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->where('section', '=', '336723')->get();
+        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->where('section', '=', '335269')->get();
         foreach ($sections as $section) {
             $section_id = $section->section;
             $team_id = $section->ms_team_id;
@@ -162,7 +160,7 @@ class MsController extends Controller
                 echo $instructor_mail . "<br>";
             }
             DB::table('sections')->where('section', '=', $section->section)->update([
-                'add_instructor' => 'success'
+                'add_instructor' => 'success',
             ]);
         }
     }
@@ -188,16 +186,17 @@ class MsController extends Controller
         $endpoint = str_replace(" ", "", $endpoint);
         $response = Http::withToken($access_token)->get($endpoint);
         $channel_id = $response->json();
-
-        DB::table('class')->where('section', '=', $section_id)->update([
-            'channel_id' => $channel_id['id'],
+        $channel_id = $channel_id['value'][0]['id'];
+        DB::table('sections')->where('section', '=', $section_id)->update([
+            'channel_id' => $channel_id,
         ]);
-        return $channel_id['id'];
+        return $channel_id;
     }
 
     public function CreateEvent()
     {
-        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
+        $sections = DB::table('view_sections')->where('section','=', '336028')->get();
+        // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
         foreach ($sections as $section) {
             $team_id = $section->ms_team_id;
             $section_id = $section->section;
@@ -205,10 +204,11 @@ class MsController extends Controller
             $channel_id = $this->getChannel($team_id, $section_id);
             $access_token = $this->getAccessTokenDatabase();
 
-            $start_date_time = '2023-06-21T12:00:00';
-            $end_date_time = '2023-06-21T12:10:00';
-            $start_date = '2023-06-21';
-            $end_date = '2023-06-21';
+            // dd($group_mail,$channel_id,$access_token,$team_id);
+            $start_date_time = '2023-07-03T12:00:00';
+            $end_date_time = '2023-07-03T13:00:00';
+            $start_date = '2023-07-03';
+            $end_date = '2023-07-30';
 
             $class_infomation = DB::table('class')->where('section', '=', $section_id)->get();
             $days_of_week = [];
@@ -218,35 +218,35 @@ class MsController extends Controller
                 $study_time = $this->calculateEndTime($start_time, $dulation_time);
                 $start_date_time = $start_date . 'T' . $study_time['start_time'];
                 $end_date_time = $end_date . 'T' . $study_time['end_time'];
-
+                // dd($row);
                 $day = strtoupper($row->week_of_day);
                 $days_of_week = $this->week_of_day[$day];
                 $data = [
 
                     "subject" => $section->calendar_subject,
                     "body" => [
-                        "contentType" => "HTML",
-                        "content" => $row->study_type
+                        "contentType" => "Text",
+                        "content" => $row->study_type,
                     ],
                     "start" => [
                         "dateTime" => $start_date_time,
-                        "timeZone" => "Asia/Bangkok"
+                        "timeZone" => "Asia/Bangkok",
                     ],
                     "end" => [
                         "dateTime" => $end_date_time,
-                        "timeZone" => "Asia/Bangkok"
+                        "timeZone" => "Asia/Bangkok",
                     ],
                     "location" => [
-                        "displayName" => $row->room_name
+                        "displayName" => $row->room_name,
                     ],
                     "attendees" => [
                         [
                             "emailAddress" => [
                                 "address" => $group_mail,
-                                "name" => "GROUP MAIL"
+                                "name" => "GROUP MAIL",
                             ],
-                            "type" => "required"
-                        ]
+                            "type" => "required",
+                        ],
                     ],
                     "isOnlineMeeting" => true,
                     "onlineMeetingProvider" > "teamsForBusiness",
@@ -255,20 +255,25 @@ class MsController extends Controller
                             "type" => "weekly",
                             "interval" => 1,
                             "daysOfWeek" => [
-                                $days_of_week
-                            ]
+                                $days_of_week,
+                            ],
                         ],
                         "range" => [
                             "type" => "endDate",
                             "startDate" => $start_date,
-                            "endDate" => $end_date
-                        ]
-                    ]
+                            "endDate" => $end_date,
+                        ],
+                    ],
 
                 ];
+                $token = $this->getAccessToken();
                 $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
-                $response = Http::withToken($access_token)->get($endpoint, $data);
-                $response_data = $response()->json();
+                $response = Http::withToken($token)->get($endpoint, $data);
+                // return response()->json($endpoint, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'],
+                // JSON_UNESCAPED_UNICODE);
+                // dd($response->json(),$data);
+                $response_data = $response->json();
+                dd($response_data);
                 $body_content = $response_data['body'];
                 $this->postMeetingToTeam($team_id, $channel_id, $body_content);
             }
@@ -296,7 +301,7 @@ class MsController extends Controller
         $access_token = $this->getAccessTokenDatabase();
         $end_point = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/channels/" . $channel_id . "/messages";
         $data = [
-            "body" => $body_content
+            "body" => $body_content,
         ];
         $response = Http::withToken($access_token)->post($end_point, $data);
     }
@@ -305,9 +310,8 @@ class MsController extends Controller
     public function processQueueCreateTeam()
     {
         // $sections = DB::table('view_sections')->whereNull('ms_team_id')->limit(1)->get();
-        $sections = DB::table('view_sections')->where('section', '=', '336723')->get();
-
-
+        $sections = DB::table('view_sections')->whereNull('ms_team_id')->get();
+// dd($sections);
         foreach ($sections as $section) {
 
             $team_name = $section->team_name;
@@ -316,13 +320,13 @@ class MsController extends Controller
 
             // $this->createTeams($team_name, $section_id, $description);
             // echo "Create Team";
-            $this->AddStudent();
+            // $this->AddStudent();
             // echo "Add Student";
             // $this->AddInstructor();
             // echo "AddInstructor";
             // $this->CreateEvent();
             // echo "Create Event";
-            // dispatch(new CreateTeam($team_name, $section_id, $description));
+            dispatch(new CreateTeam($team_name, $section_id, $description));
         }
     }
 
@@ -339,11 +343,9 @@ class MsController extends Controller
 
         return [
             'start_time' => $new_start_time,
-            'end_time' => $new_end_time
+            'end_time' => $new_end_time,
         ];
     }
 }
-
-
 
 // b50af24c-edf6-432a-8762-90e953b824d7
