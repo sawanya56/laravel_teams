@@ -60,6 +60,7 @@ class MsController extends Controller
 
     public function getAccessTokenDatabase()
     {
+        return $access_token = $this->getAccessToken();
         $model = DB::table('settings')->orderBy('id', 'desc')->first();
         $access_token = null;
         if ($model == null) {
@@ -76,11 +77,19 @@ class MsController extends Controller
 
         $access_token = $this->getAccessTokenDatabase();
 
+        $owner_email = 'prasert_kb@mju.ac.th';
         try {
             $response = Http::withToken($access_token)->post('https://graph.microsoft.com/v1.0/teams', [
                 "template@odata.bind" => "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
                 "displayName" => $team_name,
                 "description" => $description,
+                "members" => [
+                    [
+                        "@odata.type" => "#microsoft.graph.aadUserConversationMember",
+                        "roles" => ["owner"],
+                        "user@odata.bind" => "https://graph.microsoft.com/v1.0/users/" . $owner_email
+                    ]
+                ]
             ]);
 
             $result = $response->headers();
@@ -99,22 +108,28 @@ class MsController extends Controller
     public function AddStudent()
     {
 
-        $access_token = $this->getAccessTokenDatabase();
-        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_student')->get();
+
+        // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_student')->get();
+        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->where('section', '=', '336723')->get();
         foreach ($sections as $section) {
             $section_id = $section->section;
             $team_id = $section->ms_team_id;
 
             $students = DB::table('enrollments')->where('section', '=', $section_id)->get();
-
+            $access_token = $this->getAccessTokenDatabase();
+            
             foreach ($students as $student) {
                 $student_mail = $student->student_mail;
                 //CALL API TEAM
                 $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
                 $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
+
                 $response = Http::withToken($access_token)->post($url, [
                     "@odata.id" => $student_mail,
                 ]);
+
+                echo $url . '<br>';
+                echo $student_mail . "<br>";
                 //END CALL API
             }
             DB::table('sections')->where('section', '=', $section->section)->update([
@@ -127,7 +142,8 @@ class MsController extends Controller
     {
         $access_token = $this->getAccessTokenDatabase();
         // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->get();
-        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_instructor')->get();
+        // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_instructor')->get();
+        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->where('section', '=', '336723')->get();
         foreach ($sections as $section) {
             $section_id = $section->section;
             $team_id = $section->ms_team_id;
@@ -142,6 +158,8 @@ class MsController extends Controller
                     "@odata.id" => $instructor_mail,
 
                 ]);
+
+                echo $instructor_mail . "<br>";
             }
             DB::table('sections')->where('section', '=', $section->section)->update([
                 'add_instructor' => 'success'
@@ -177,7 +195,7 @@ class MsController extends Controller
         return $channel_id['id'];
     }
 
-    public function CreateEvent($data)
+    public function CreateEvent()
     {
         $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
         foreach ($sections as $section) {
@@ -286,7 +304,9 @@ class MsController extends Controller
     //----------------------------------------- QUEUE -----------------------------------------------//
     public function processQueueCreateTeam()
     {
-        $sections = DB::table('view_sections')->whereNull('ms_team_id')->limit(1)->get();
+        // $sections = DB::table('view_sections')->whereNull('ms_team_id')->limit(1)->get();
+        $sections = DB::table('view_sections')->where('section', '=', '336723')->get();
+
 
         foreach ($sections as $section) {
 
@@ -294,7 +314,14 @@ class MsController extends Controller
             $section_id = $section->section;
             $description = $section->description;
 
-            $this->createTeams($team_name, $section_id, $description);
+            // $this->createTeams($team_name, $section_id, $description);
+            // echo "Create Team";
+            $this->AddStudent();
+            // echo "Add Student";
+            // $this->AddInstructor();
+            // echo "AddInstructor";
+            // $this->CreateEvent();
+            // echo "Create Event";
             // dispatch(new CreateTeam($team_name, $section_id, $description));
         }
     }
@@ -316,3 +343,7 @@ class MsController extends Controller
         ];
     }
 }
+
+
+
+// b50af24c-edf6-432a-8762-90e953b824d7
