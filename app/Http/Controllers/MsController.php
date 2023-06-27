@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CreateTeam;
 use App\Jobs\DeleteAllTeam;
 use DateTime;
 use Exception;
@@ -76,7 +77,7 @@ class MsController extends Controller
 
         $access_token = $this->getAccessTokenDatabase();
 
-        $owner_email = 'prasert_kb@mju.ac.th';
+        $owner_email = 'sawanya_kck@mju.ac.th';
         try {
             $response = Http::withToken($access_token)->post('https://graph.microsoft.com/v1.0/teams', [
                 "template@odata.bind" => "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
@@ -107,8 +108,8 @@ class MsController extends Controller
     public function AddStudent()
     {
 
-        // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_student')->get();
-        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereIn('section', ['333083', '335260'])->get();
+        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_student')->get();
+        // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereIn('section', ['333083', '335260'])->get();
         foreach ($sections as $section) {
             $section_id = $section->section;
             $team_id = $section->ms_team_id;
@@ -256,7 +257,7 @@ class MsController extends Controller
                             "type" => "weekly",
                             "interval" => 1,
                             "daysOfWeek" => [
-                                $days_of_week
+                                $days_of_week,
                             ],
                         ],
                         "range" => [
@@ -281,7 +282,7 @@ class MsController extends Controller
 
                 $retuen = [
                     'data' => $data,
-                    'end_point' => $endpoint
+                    'end_point' => $endpoint,
                 ];
                 // return response()->json($retuen, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
 
@@ -304,7 +305,6 @@ class MsController extends Controller
                     $body_content = $response['body'];
                     // dd($section_id,$meeting_url,$event_id);
                     // DB::beginTransaction();
-
 
                     DB::table('class')->where('id', '=', $row->id)->update([
                         'event_id' => $event_id,
@@ -353,8 +353,8 @@ class MsController extends Controller
     //----------------------------------------- QUEUE -----------------------------------------------//
     public function processQueueCreateTeam()
     {
-        // $sections = DB::table('view_sections')->whereNull('ms_team_id')->limit(1)->get();
-        $sections = DB::table('view_sections')->where('section', '=', '336028')->get();
+        $sections = DB::table('view_sections')->whereNull('ms_team_id')->get();
+        // $sections = DB::table('view_sections')->where('section', '=', '336028')->get();
 
         foreach ($sections as $section) {
 
@@ -362,7 +362,7 @@ class MsController extends Controller
             $section_id = $section->section;
             $description = $section->description;
 
-            $this->createTeams($team_name, $section_id, $description);
+            // $this->createTeams($team_name, $section_id, $description);
             // echo "Create Team";
             // $this->AddStudent();
             // echo "Add Student";
@@ -370,7 +370,7 @@ class MsController extends Controller
             // echo "AddInstructor";
             // $this->CreateEvent();
             // echo "Create Event";
-            // dispatch(new CreateTeam($team_name, $section_id, $description));
+            dispatch(new CreateTeam($team_name, $section_id, $description));
         }
     }
 
