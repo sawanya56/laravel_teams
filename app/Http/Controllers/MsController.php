@@ -377,6 +377,17 @@ class MsController extends Controller
             'end_time' => $new_end_time,
         ];
     }
+
+    public function deleteAllEvent()
+    {
+        $events = DB::table('class')->whereNotNull('evnet_id')->get();
+        foreach ($events as $event) {
+            $token = env('TOKEN');
+            $endpoint = "https://graph.microsoft.com/v1.0/me/events/" . $event->event_id;
+
+            $response = Http::withToken($token)->delete($endpoint);
+        }
+    }
 }
 
 // b50af24c-edf6-432a-8762-90e953b824d7
