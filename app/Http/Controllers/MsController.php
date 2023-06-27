@@ -196,8 +196,8 @@ class MsController extends Controller
 
     public function CreateEvent()
     {
-        $sections = DB::table('view_sections')->where('section', '=', '336028')->get();
-        // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
+        // $sections = DB::table('view_sections')->where('section', '=', '336028')->get();
+        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
         foreach ($sections as $section) {
             $team_id = $section->ms_team_id;
             $section_id = $section->section;
@@ -209,7 +209,7 @@ class MsController extends Controller
             // $start_date_time = '2023-07-03T12:00:00';
             // $end_date_time = '2023-07-03T13:00:00';
             $start_date = '2023-07-03';
-            $end_date = '2023-07-30';
+            $end_date = '2023-11-06';
 
             $class_infomation = DB::table('class')->where('section', '=', $section_id)->get();
             $days_of_week = [];
@@ -269,22 +269,8 @@ class MsController extends Controller
                 ];
 
                 //Check Meeting URL In Database
-                $meeting_url = DB::table('sections')->where('section', '=', $section_id)->whereNotNull('meeting_url')->first();
-                if ($meeting_url != null) {
-                    // unset($data['isOnlineMeeting']);
-                    // unset($data['onlineMeetingProvider']);
-                    $data['onlineMeetingUrl'] = $meeting_url->meeting_url;
-                }
-
-                // $token = $this->getAccessToken();
-                $token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6Ik81N1BjZUwtTkQyVE80a1ZIMDYwcTFlNW5KdG5QT0hxVTdIV3plb0h2VzgiLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgvIiwiaWF0IjoxNjg3Nzg4MjE0LCJuYmYiOjE2ODc3ODgyMTQsImV4cCI6MTY4Nzc5Mjk3NywiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFUUUF5LzhUQUFBQVpkaEpBWk90L3hSRUFIL3V4UXhvWEdjaVhjaDQ2Q3ZWT2JaMUY3N3duVXVsT0Rmc1JCVXJ1Z1B5eGxJZGZzZmwiLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6IkdyYXBoIEV4cGxvcmVyIiwiYXBwaWQiOiJkZThiYzhiNS1kOWY5LTQ4YjEtYThhZC1iNzQ4ZGE3MjUwNjQiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IuC4geC4uOC4peC4muC4o-C4tOC4hOC4uOC4myIsImdpdmVuX25hbWUiOiLguJvguKPguLDguYDguKrguKPguLTguJAiLCJpZHR5cCI6InVzZXIiLCJpcGFkZHIiOiIxLjIwLjE0MS4xMzQiLCJuYW1lIjoi4Lib4Lij4Liw4LmA4Liq4Lij4Li04LiQICDguIHguLjguKXguJrguKPguLTguITguLjguJsiLCJvaWQiOiJiNmY0NDZmZS04NDI2LTQzODMtOTlmOS04MWEzYjRiMmYwMTkiLCJvbnByZW1fc2lkIjoiUy0xLTUtMjEtNzkwNTI1NDc4LTEwNzgwODE1MzMtODM5NTIyMTE1LTY4OTUyNiIsInBsYXRmIjoiMyIsInB1aWQiOiIxMDAzMjAwMDM5MjQyMDQwIiwicmgiOiIwLkFWTUFPVXJIanZiZDRVR3dvdjhFV2VxT3VBTUFBQUFBQUFBQXdBQUFBQUFBQUFCVEFPby4iLCJzY3AiOiJDYWxlbmRhcnMuUmVhZFdyaXRlIENoYW5uZWwuUmVhZEJhc2ljLkFsbCBDaGFubmVsTWVzc2FnZS5TZW5kIENoYXQuUmVhZCBDaGF0LlJlYWRCYXNpYyBDaGF0LlJlYWRXcml0ZSBDaGF0TWVzc2FnZS5TZW5kIENvbnRhY3RzLlJlYWRXcml0ZSBEZXZpY2VNYW5hZ2VtZW50UkJBQy5SZWFkLkFsbCBEZXZpY2VNYW5hZ2VtZW50U2VydmljZUNvbmZpZy5SZWFkLkFsbCBGaWxlcy5SZWFkV3JpdGUuQWxsIEdyb3VwLlJlYWRXcml0ZS5BbGwgSWRlbnRpdHlSaXNrRXZlbnQuUmVhZC5BbGwgTWFpbC5SZWFkIE1haWwuUmVhZFdyaXRlIE1haWxib3hTZXR0aW5ncy5SZWFkV3JpdGUgTm90ZXMuUmVhZFdyaXRlLkFsbCBvcGVuaWQgUGVvcGxlLlJlYWQgUGxhY2UuUmVhZCBQcmVzZW5jZS5SZWFkIFByZXNlbmNlLlJlYWQuQWxsIFByaW50ZXJTaGFyZS5SZWFkQmFzaWMuQWxsIFByaW50Sm9iLkNyZWF0ZSBQcmludEpvYi5SZWFkQmFzaWMgcHJvZmlsZSBSZXBvcnRzLlJlYWQuQWxsIFNpdGVzLlJlYWRXcml0ZS5BbGwgVGFza3MuUmVhZFdyaXRlIFRlYW0uQ3JlYXRlIFRlYW0uUmVhZEJhc2ljLkFsbCBVc2VyLlJlYWQgVXNlci5SZWFkQmFzaWMuQWxsIFVzZXIuUmVhZFdyaXRlIFVzZXIuUmVhZFdyaXRlLkFsbCBlbWFpbCIsInN1YiI6IkY5RUxZQnppSFVLYXFtWDJhOTlFT2dZU2V5RzFHUm44Vl9NVk9vdHVQSDQiLCJ0ZW5hbnRfcmVnaW9uX3Njb3BlIjoiQVMiLCJ0aWQiOiI4ZWM3NGEzOS1kZGY2LTQxZTEtYjBhMi1mZjA0NTllYThlYjgiLCJ1bmlxdWVfbmFtZSI6InByYXNlcnRfa2JAbWp1LmFjLnRoIiwidXBuIjoicHJhc2VydF9rYkBtanUuYWMudGgiLCJ1dGkiOiIybVdnRGk2M0UwR0xEX0l5dGJFeEFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyJiNzlmYmY0ZC0zZWY5LTQ2ODktODE0My03NmIxOTRlODU1MDkiXSwieG1zX2NjIjpbIkNQMSJdLCJ4bXNfc3NtIjoiMSIsInhtc19zdCI6eyJzdWIiOiJ3YnpKSlFpNmlRU2UtYzhmaGE3NkhtOGdyczJ6MzZwZ3o1aktrZG9ab1pJIn0sInhtc190Y2R0IjoxMzkzMjE0NjkzfQ.DMbFkg4h5sSu3v76--z5icj7dqsC7OGE7gTUZgk-LzeS4F4hwSTUnD3sEyP4mOKrtOtSGIuvYfqfOTWAUCWIVWmPSYwIKU50ZQA0uB6y5JXb2eiuVeis5ZH0UjlO-fN1g6AsvXPRUSDjAc5AwFYoodXYsPbq4a-pvmqWD2_Mi7_1BpWPhMcgarxAODoLYCoq0rYwkGnRxtE_JwMn-XC31fkVApLZJzapUuJvjhvWykGTLRP2xZ1pUWwgpuCZpNRDNQyecpK72byyTA1fVDR0xJDuk8J_ScTH9clrXzDeOKRXn5e9cAVVxXTf0wtrgjacNLDzrJxcx6i2rjZU1MWWnA';
+                $token = env('TOKEN');
                 $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
-
-                $retuen = [
-                    'data' => $data,
-                    'end_point' => $endpoint,
-                ];
-                // return response()->json($retuen, 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
 
                 $response = Http::withToken($token)->post($endpoint, $data);
                 $response_data = $response->json();
@@ -296,23 +282,13 @@ class MsController extends Controller
                     //Create Success
                     // dd($response_data);
                     $event_id = $response['id'];
-                    if ($meeting_url == null) {
-                        $meeting_url = $response['onlineMeeting']['joinUrl'];
-                        DB::table('sections')->where('section', '=', $section_id)->update([
-                            'meeting_url' => $meeting_url,
-                        ]);
-                    }
+
                     $body_content = $response['body'];
-                    // dd($section_id,$meeting_url,$event_id);
-                    // DB::beginTransaction();
 
                     DB::table('class')->where('id', '=', $row->id)->update([
                         'event_id' => $event_id,
                     ]);
-                    // DB::commit();
-                    echo "Success";
-                    // dd($event_id,$meeting_url ,$body_content);
-                    // $this->postMeetingToTeam($team_id, $channel_id, $body_content);
+                    $this->postMeetingToTeam($team_id, $channel_id, $body_content);
                 }
             }
         }
