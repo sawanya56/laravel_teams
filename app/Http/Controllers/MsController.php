@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CreateEventJob;
 use App\Jobs\CreateTeam;
 use App\Jobs\DeleteAllTeam;
 use DateTime;
@@ -194,10 +195,10 @@ class MsController extends Controller
         return $channel_id;
     }
 
-    public function CreateEvent()
+    public function CreateEvent($section_id)
     {
-        // $sections = DB::table('view_sections')->where('section', '=', '336028')->get();
-        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
+        $sections = DB::table('view_sections')->where('section', '=', $section_id)->get();
+        // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
         foreach ($sections as $section) {
             $team_id = $section->ms_team_id;
             $section_id = $section->section;
@@ -345,8 +346,18 @@ class MsController extends Controller
             // $this->AddInstructor();
             // echo "AddInstructor";
             // $this->CreateEvent();
-            // echo "Create Event";
             dispatch(new CreateTeam($team_name, $section_id, $description));
+            // echo "Create Event";
+            // dispatch(new CreateTeam($team_name, $section_id, $description));
+        }
+    }
+
+    public function porcessQueueCreateEvent()
+    {
+        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
+        foreach ($sections as $section) {
+            $section_id = $sections->section;
+            dispatch(new CreateEventJob($section_id));
         }
     }
 
