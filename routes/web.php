@@ -23,7 +23,7 @@ Route::get('/', function () {
 // Route::get('test','TestController@');
 Route::get('team/token',[MsController::class,'getAccessToken']);
 Route::get('team/create',[MsController::class,'processQueueCreateTeam']);
-Route::get('team/student/add',[MsController::class,'AddStudent']);
+Route::get('team/student/add',[MsController::class,'processQueueAddStudent']);
 Route::get('team/instructor/add',[MsController::class,'AddInstructor']);
 
 Route::get('groupmail',[MsController::class,'getGroupmail']);
@@ -32,5 +32,6 @@ Route::get('groupmail',[MsController::class,'getGroupmail']);
 
 
 Route::get('team/delete',[MsController::class,'processQueueDeleteAllTeam']);
+Route::get('team/event/delete',[MsController::class,'deleteAllEvent']);
 Route::get('team/event/create',[MsController::class,'porcessQueueCreateEvent']);
 

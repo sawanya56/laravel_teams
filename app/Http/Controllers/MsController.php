@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\AddStudentJob;
 use App\Jobs\CreateEventJob;
-use App\Jobs\CreateTeam;
 use App\Jobs\DeleteAllTeam;
 use DateTime;
 use Exception;
@@ -106,36 +106,28 @@ class MsController extends Controller
         }
     }
 
-    public function AddStudent()
+    public function AddStudent($section_id, $team_id)
     {
 
-        $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_student')->get();
-        // $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereIn('section', ['333083', '335260'])->get();
-        foreach ($sections as $section) {
-            $section_id = $section->section;
-            $team_id = $section->ms_team_id;
+        $students = DB::table('enrollments')->where('section', '=', $section_id)->get();
+        $access_token = $this->getAccessTokenDatabase();
 
-            $students = DB::table('enrollments')->where('section', '=', $section_id)->get();
-            $access_token = $this->getAccessTokenDatabase();
+        foreach ($students as $student) {
+            $student_mail = $student->student_mail;
 
-            foreach ($students as $student) {
-                $student_mail = $student->student_mail;
-                //CALL API TEAM
-                $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
-                $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
+            //CALL API TEAM
+            $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
+            $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
 
-                $response = Http::withToken($access_token)->post($url, [
-                    "@odata.id" => $student_mail,
-                ]);
-
-                echo $url . '<br>';
-                echo $student_mail . "<br>";
-                //END CALL API
-            }
-            DB::table('sections')->where('section', '=', $section->section)->update([
-                'add_student' => 'success',
+            $response = Http::withToken($access_token)->post($url, [
+                "@odata.id" => $student_mail,
             ]);
+
         }
+        DB::table('sections')->where('section', '=', $section_id)->update([
+            'add_student' => 'success',
+        ]);
+
     }
 
     public function AddInstructor()
@@ -304,6 +296,9 @@ class MsController extends Controller
         DB::beginTransaction();
         DB::table('sections')->where('section', '=', $section_id)->update([
             'ms_team_id' => null,
+            'add_student' => null,
+            'add_event' => null,
+            'add_instructor' => null
         ]);
         DB::commit();
     }
@@ -330,7 +325,7 @@ class MsController extends Controller
     //----------------------------------------- QUEUE -----------------------------------------------//
     public function processQueueCreateTeam()
     {
-        $sections = DB::table('view_sections')->whereNull('ms_team_id')->get();
+        $sections = DB::table('view_sections')->whereNull('ms_team_id')->limit(10)->get();
         // $sections = DB::table('view_sections')->where('section', '=', '336028')->get();
 
         foreach ($sections as $section) {
@@ -346,7 +341,7 @@ class MsController extends Controller
             // $this->AddInstructor();
             // echo "AddInstructor";
             // $this->CreateEvent();
-            dispatch(new CreateTeam($team_name, $section_id, $description));
+            // dispatch(new CreateTeam($team_name, $section_id, $description));
             // echo "Create Event";
             // dispatch(new CreateTeam($team_name, $section_id, $description));
         }
@@ -356,8 +351,22 @@ class MsController extends Controller
     {
         $sections = DB::table('view_sections')->select('section', 'ms_team_id')->whereNotNull('ms_team_id')->whereNull('add_event')->get();
         foreach ($sections as $section) {
-            $section_id = $sections->section;
+            $section_id = $section->section;
             dispatch(new CreateEventJob($section_id));
+        }
+    }
+
+    public function processQueueAddStudent()
+    {
+        $sections = DB::table('view_sections')->select('section', 'ms_team_id')
+            ->whereNotNull('ms_team_id')
+            ->whereNull('add_student')
+            ->limit(5)
+            ->get();
+        foreach ($sections as $section) {
+            $section_id = $section->section;
+            $team_id = $section->ms_team_id;
+            dispatch(new AddStudentJob($section_id, $team_id));
         }
     }
 
@@ -380,12 +389,20 @@ class MsController extends Controller
 
     public function deleteAllEvent()
     {
-        $events = DB::table('class')->whereNotNull('evnet_id')->get();
+        $events = DB::table('class')->whereNotNull('event_id')->get();
         foreach ($events as $event) {
+
             $token = env('TOKEN');
-            $endpoint = "https://graph.microsoft.com/v1.0/me/events/" . $event->event_id;
+            $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/events/" . $event->event_id;
 
             $response = Http::withToken($token)->delete($endpoint);
+            $json = $response->json();
+
+            if (isset($json['error'])) {
+                echo $event->event_id . "<br><br>";
+            } else {
+                dd($json);
+            }
         }
     }
 }
