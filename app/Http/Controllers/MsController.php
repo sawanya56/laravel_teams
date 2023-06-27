@@ -122,12 +122,10 @@ class MsController extends Controller
             $response = Http::withToken($access_token)->post($url, [
                 "@odata.id" => $student_mail,
             ]);
-
         }
         DB::table('sections')->where('section', '=', $section_id)->update([
             'add_student' => 'success',
         ]);
-
     }
 
     public function AddInstructor()
@@ -402,6 +400,63 @@ class MsController extends Controller
                 echo $event->event_id . "<br><br>";
             } else {
                 dd($json);
+            }
+        }
+    }
+    public function test()
+    {
+        $groupId = "8289e2af-7dce-48ad-accb-e98b65910d32";
+        $accessToken = env('TOKEN');
+
+        $groupCalendarUrl = "https://graph.microsoft.com/v1.0/groups/$groupId/calendar";
+        $groupCalendarResponse = Http::withToken($accessToken)->get($groupCalendarUrl);
+        $groupCalendarData = $groupCalendarResponse->json();
+        $groupCalendarId = $groupCalendarData["id"];
+
+        // Get the events from the group's calendar
+        $groupEventsUrl = "https://graph.microsoft.com/v1.0/groups/$groupId/calendar/events";
+        $groupEventsResponse = Http::withToken($accessToken)->get($groupEventsUrl);
+        $groupEventsData = $groupEventsResponse->json();
+        $groupEvents = $groupEventsData["value"];
+
+        // Display the group events on the member's calendar
+        $memberEventsUrl = "https://graph.microsoft.com/v1.0/me/calendar/events";
+
+
+        foreach ($groupEvents as $event) {
+            $memberEventResponse = Http::withToken($accessToken)->post($memberEventsUrl, $event);
+            $memberEventData = $memberEventResponse->json();
+            $memberEventStatusCode = $memberEventResponse->status();
+
+            if ($memberEventStatusCode === 201) {
+                echo "Event added to member's calendar.\n";
+            } else {
+                echo "Error adding event: $memberEventStatusCode\n";
+            }
+        }
+
+
+
+
+        foreach ($groupEvents as $event) {
+            // Compare the event properties to check for a match
+            $existingEventResponse = Http::withToken($accessToken)->get($memberEventsUrl, [
+                '$filter' => "subject eq '{$event['subject']}' and start/dateTime eq '{$event['start']['dateTime']}' and end/dateTime eq '{$event['end']['dateTime']}'"
+            ]);
+
+            $existingEventData = $existingEventResponse->json();
+            if (!empty($existingEventData['value'])) {
+                $existingEventIds[] = $existingEventData['value'][0]['id'];
+            } else {
+                $memberEventResponse = Http::withToken($accessToken)->post($memberEventsUrl, $event);
+                $memberEventData = $memberEventResponse->json();
+                $memberEventStatusCode = $memberEventResponse->status();
+
+                if ($memberEventStatusCode === 201) {
+                    echo "Event added to member's calendar.\n";
+                } else {
+                    echo "Error adding event: $memberEventStatusCode\n";
+                }
             }
         }
     }
