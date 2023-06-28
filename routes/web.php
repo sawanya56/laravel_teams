@@ -21,7 +21,7 @@ Route::get('/', function () {
 });
 
 
-Route::get('test',[MsController::class,'AddInstructor']);
+Route::get('test',[MsController::class,'CreateEvent']);
 
 
 Route::get('team/token',[MsController::class,'getAccessToken']);

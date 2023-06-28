@@ -191,7 +191,7 @@ class MsController extends Controller
         $response = Http::withToken($access_token)->get($endpoint);
         $channel_id = $response->json();
         $channel_id = $channel_id['value'][0]['id'];
-        DB::table('class')->where('class', '=', $class_id)->update([
+        DB::table('class')->where('class_id', '=', $class_id)->update([
             'channel_id' => $channel_id,
         ]);
         return $channel_id;
@@ -199,7 +199,7 @@ class MsController extends Controller
 
     public function CreateEvent($class_id)
     {
-        $all_class = DB::table('class')->where('class', '=', $class_id)->get();
+        $all_class = DB::table('class')->where('class_id', '=', $class_id)->get();
         foreach ($all_class as $class) {
             $team_id = $class->team_id;
             $class_id = $class->class_id;
@@ -225,7 +225,7 @@ class MsController extends Controller
 
                     "subject" => $class->calendar_subject,
                     "body" => [
-                        "contentType" => "Text",
+                        "contentType" => "html",
                         "content" => $row->study_type,
                     ],
                     "start" => [
@@ -273,14 +273,13 @@ class MsController extends Controller
                 $response = Http::withToken($token)->post($endpoint, $data);
                 $response_data = $response->json();
 
-                // dd($response,$response->json());
                 if (isset($response_data['error'])) {
                 } else {
                     //Create Success
                     $event_id = $response['id'];
 
                     $body_content = $response['body'];
-
+                    // dd($body_content);
                     DB::table('class')->where('id', '=', $row->id)->update([
                         'event_id' => $event_id,
                     ]);
@@ -309,12 +308,14 @@ class MsController extends Controller
 
     public function postMeetingToTeam($team_id, $channel_id, $body_content)
     {
-        $access_token = $this->getAccessTokenDatabase();
+        $access_token = env('TOKEN');
         $end_point = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/channels/" . $channel_id . "/messages";
         $data = [
+            "subject" => "New Message Title",
             "body" => $body_content,
         ];
         $response = Http::withToken($access_token)->post($end_point, $data);
+        dd($response->json());
     }
 
     //----------------------------------------- QUEUE -----------------------------------------------//
