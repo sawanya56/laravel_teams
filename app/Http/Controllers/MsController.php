@@ -388,7 +388,7 @@ class MsController extends Controller
         ];
     }
 
-    public function deleteAllEvent()
+    public function deleteAllEvent($team_id)
     {
         $events = DB::table('class')->whereNotNull('event_id')->get();
         foreach ($events as $event) {
