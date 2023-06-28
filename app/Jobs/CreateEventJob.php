@@ -17,11 +17,11 @@ class CreateEventJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    private $section_id;
+    private $class_id;
 
-    public function __construct($section_id)
+    public function __construct($class_id)
     {
-        $this->section_id = $section_id;
+        $this->class_id = $class_id;
     }
 
     /**
@@ -30,6 +30,6 @@ class CreateEventJob implements ShouldQueue
     public function handle(): void
     {
         $job = new MsController();
-        $job->CreateEvent($this->section_id);
+        $job->CreateEvent($this->class_id);
     }
 }

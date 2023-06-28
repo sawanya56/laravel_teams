@@ -20,7 +20,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('test','TestController@');
+Route::get('test',[MsController::class,'processQueueAddStudent']); 
 Route::get('team/token',[MsController::class,'getAccessToken']);
 Route::get('team/create',[MsController::class,'processQueueCreateTeam']);
 Route::get('team/student/add',[MsController::class,'processQueueAddStudent']);

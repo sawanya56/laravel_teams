@@ -17,11 +17,11 @@ class AddStudentJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    private $section_id;
+    private $class_id;
     private $teams_id;
-    public function __construct($section_id,$teams_id)
+    public function __construct($class_id, $teams_id)
     {
-        $this->section_id = $section_id;
+        $this->class_id = $class_id;
         $this->teams_id = $teams_id;
     }
 
@@ -31,6 +31,6 @@ class AddStudentJob implements ShouldQueue
     public function handle(): void
     {
         $job = new MsController();
-        $job->AddStudent($this->section_id,$this->teams_id);
+        $job->AddStudent($this->class_id, $this->teams_id);
     }
 }
