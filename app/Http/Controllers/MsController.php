@@ -128,7 +128,7 @@ class MsController extends Controller
             if ($response->successful()) {
                 // Success
                 DB::table('enrollments')->where('id', '=', $student->id)->update([
-                    'add_success' => "success"
+                    'add_success' => "success",
                 ]);
             } else {
                 //Add Fail
@@ -136,7 +136,7 @@ class MsController extends Controller
         }
 
         MjuClass::where('class_id', '=', $class_id)->update([
-            'add_student' => "success"
+            'add_student' => "success",
         ]);
     }
 
@@ -159,7 +159,7 @@ class MsController extends Controller
             if ($response->successful()) {
                 // Success
                 DB::table('instructors')->where('id', '=', $item->id)->update([
-                    'add_success' => "success"
+                    'add_success' => "success",
                 ]);
                 echo "success";
             } else {
@@ -300,11 +300,10 @@ class MsController extends Controller
             'team_id' => null,
             'add_student' => null,
             'add_event' => null,
-            'add_instructor' => null
+            'add_instructor' => null,
         ]);
         DB::commit();
     }
-
 
     public function postMeetingToTeam($team_id, $channel_id, $body_content)
     {
@@ -331,15 +330,20 @@ class MsController extends Controller
 
     public function processQueueCreateTeam()
     {
-        $all_class = MjuClass::whereNull('team_id')->groupBy('class_id')->limit(1)->get();
+        $all_class = MjuClass::whereNull('team_id')->groupBy('class_id')->get();
         foreach ($all_class as $class) {
 
             // dd($class->getCourse);
-            $team_name = $class->team_name;
-            $class_id = $class->class_id;
-            $description = $class->getCourse->description;
+            try {
+                $team_name = $class->team_name;
+                $class_id = $class->class_id;
+                $description = $class->getCourse->description;
+                dispatch(new CreateTeam($team_name, $class_id, $description));
+            } catch (Exception $e) {
+                echo $class_id."<br>";
+            }
+
             // $this->createTeams($team_name, $section_id, $description);
-            dispatch(new CreateTeam($team_name, $class_id, $description));
         }
     }
 
@@ -426,7 +430,6 @@ class MsController extends Controller
         // Display the group events on the member's calendar
         $memberEventsUrl = "https://graph.microsoft.com/v1.0/me/calendar/events";
 
-
         foreach ($groupEvents as $event) {
             $memberEventResponse = Http::withToken($accessToken)->post($memberEventsUrl, $event);
             $memberEventData = $memberEventResponse->json();
@@ -439,13 +442,10 @@ class MsController extends Controller
             }
         }
 
-
-
-
         foreach ($groupEvents as $event) {
             // Compare the event properties to check for a match
             $existingEventResponse = Http::withToken($accessToken)->get($memberEventsUrl, [
-                '$filter' => "subject eq '{$event['subject']}' and start/dateTime eq '{$event['start']['dateTime']}' and end/dateTime eq '{$event['end']['dateTime']}'"
+                '$filter' => "subject eq '{$event['subject']}' and start/dateTime eq '{$event['start']['dateTime']}' and end/dateTime eq '{$event['end']['dateTime']}'",
             ]);
 
             $existingEventData = $existingEventResponse->json();
