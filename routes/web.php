@@ -20,11 +20,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test',[MsController::class,'processQueueAddStudent']); 
+
+Route::get('test',[MsController::class,'AddInstructor']);
+
+
 Route::get('team/token',[MsController::class,'getAccessToken']);
+
 Route::get('team/create',[MsController::class,'processQueueCreateTeam']);
 Route::get('team/student/add',[MsController::class,'processQueueAddStudent']);
-Route::get('team/instructor/add',[MsController::class,'AddInstructor']);
+Route::get('team/instructor/add',[MsController::class,'processQueueAddInstructor']);
+Route::get('team/event/create',[MsController::class,'porcessQueueCreateEvent']);
+
 
 Route::get('groupmail',[MsController::class,'getGroupmail']);
 

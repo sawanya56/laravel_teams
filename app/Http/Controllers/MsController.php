@@ -103,6 +103,8 @@ class MsController extends Controller
             $model = new MjuClass();
             $model->updateMsTeamId($class_id, $ms_team_id);
         } catch (Exception $e) {
+            echo $class_id;
+            echo $e->getMessage();
         }
     }
 
@@ -138,33 +140,31 @@ class MsController extends Controller
         ]);
     }
 
-    public function AddInstructor($class_id)
+    public function AddInstructor($class_id, $team_id)
     {
         $access_token = $this->getAccessTokenDatabase();
-        $model = new MjuClass();
-        $all_class = $model->getClassInstructorNull();
-        foreach ($all_class as $class) {
-            $class_id = $class->class_id;
-            $team_id = $class->ms_team_id;
 
-            $instructors = DB::table('instructors')->where('class_id', '=', $class_id)->get();
-            foreach ($instructors as $item) {
-                $instructor_mail = $item->email;
-                $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/owners/$ref';
-                $instructor_mail = "https://graph.microsoft.com/v1.0/users/" . $instructor_mail;
-                $response = Http::withToken($access_token)->post($url, [
-                    "@odata.id" => $instructor_mail,
+        $instructors = DB::table('instructors')->where('class_id', '=', $class_id)->get();
+        foreach ($instructors as $item) {
+            $instructor_mail = $item->email;
+            $instructor_mail = strtolower($instructor_mail);
+            $instructor_mail = trim($instructor_mail);
 
+            $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/owners/$ref';
+            $instructor_mail = "https://graph.microsoft.com/v1.0/users/" . $instructor_mail;
+            $response = Http::withToken($access_token)->post($url, [
+                "@odata.id" => $instructor_mail,
+
+            ]);
+            if ($response->successful()) {
+                // Success
+                DB::table('instructors')->where('id', '=', $item->id)->update([
+                    'add_success' => "success"
                 ]);
-
-                if ($response->successful()) {
-                    // Success
-                    DB::table('instructors')->where('id', '=', $item->id)->update([
-                        'add_instructor' => "success"
-                    ]);
-                } else {
-                    //Fail
-                }
+                echo "success";
+            } else {
+                //Fail
+                echo "fail";
             }
         }
     }
@@ -205,7 +205,7 @@ class MsController extends Controller
             $class_id = $class->class_id;
             $group_mail = $this->getGroupmail($team_id, $class_id);
             $channel_id = $this->getChannel($team_id, $class_id);
-    
+
             $start_date = '2023-07-03';
             $end_date = '2023-11-06';
 
@@ -290,15 +290,15 @@ class MsController extends Controller
         }
     }
 
-    public function deleteAllGroup($team_id, $section_id, $access_token)
+    public function deleteAllGroup($team_id, $class_id, $access_token)
     {
         // $access_token = $this->getAccessToken();
         $end_point = "https://graph.microsoft.com/v1.0/groups/" . $team_id;
         $response = Http::withToken($access_token)->delete($end_point);
 
         DB::beginTransaction();
-        DB::table('sections')->where('section', '=', $section_id)->update([
-            'ms_team_id' => null,
+        DB::table('class')->where('class_id', '=', $class_id)->update([
+            'team_id' => null,
             'add_student' => null,
             'add_event' => null,
             'add_instructor' => null
@@ -321,16 +321,16 @@ class MsController extends Controller
 
     public function processQueueDeleteAllTeam()
     {
-        $sections = DB::table('view_sections')->whereNotNull('ms_team_id')->get();
+        $all_class = DB::table('class')->whereNotNull('team_id')->groupBy('class_id')->get();
         $access_token = $this->getAccessToken();
-        foreach ($sections as $section) {
-            dispatch(new DeleteAllTeam($section->section, $section->ms_team_id, $access_token));
+        foreach ($all_class as $class) {
+            dispatch(new DeleteAllTeam($class->class_id, $class->team_id, $access_token));
         }
     }
 
     public function processQueueCreateTeam()
     {
-        $all_class = MjuClass::whereNull('team_id')->groupBy('class_id')->get();
+        $all_class = MjuClass::whereNull('team_id')->groupBy('class_id')->limit(1)->get();
         foreach ($all_class as $class) {
 
             // dd($class->getCourse);
@@ -366,7 +366,7 @@ class MsController extends Controller
         $all_class = $model->getClassInstructorNull();
         foreach ($all_class as $class) {
             $class_id = $class->class_id;
-            $team_id = $class->ms_team_id;
+            $team_id = $class->team_id;
             dispatch(new AddInstructorJob($class_id, $team_id));
         }
     }

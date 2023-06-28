@@ -16,13 +16,13 @@ class DeleteAllTeam implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    private $section_id;
-    private $ms_team_id;
+    private $class_id;
+    private $team_id;
     private $access_token;
-    public function __construct($section_id, $ms_team_id,$access_token)
+    public function __construct($class_id, $team_id,$access_token)
     {
-        $this->section_id = $section_id;
-        $this->ms_team_id = $ms_team_id;
+        $this->class_id = $class_id;
+        $this->team_id = $team_id;
         $this->access_token = $access_token;
     }
 
@@ -32,6 +32,6 @@ class DeleteAllTeam implements ShouldQueue
     public function handle(): void
     {
         $job = new MsController();
-        $job->deleteAllGroup($this->ms_team_id,$this->section_id,$this->access_token);
+        $job->deleteAllGroup($this->team_id,$this->class_id,$this->access_token);
     }
 }
