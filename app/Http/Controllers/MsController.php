@@ -130,11 +130,18 @@ class MsController extends Controller
                 DB::table('enrollments')->where('id', '=', $student->id)->update([
                     'add_success' => "success",
                 ]);
+                echo $student->student_mail . " : success \n";
             } else {
+                $error = $response->json();
+                $message = $error['error']['message'];
+                DB::table('enrollments')->where('id', '=', $student->id)->update([
+                    'add_success' => $message,
+                ]);
+                echo $student->student_mail . " : ." . $message . "\n";
                 //Add Fail
             }
         }
-
+        echo "class id : " . $class_id;
         MjuClass::where('class_id', '=', $class_id)->update([
             'add_student' => "success",
         ]);
@@ -144,7 +151,7 @@ class MsController extends Controller
     {
         $access_token = $this->getAccessTokenDatabase();
 
-        $instructors = DB::table('instructors')->where('class_id', '=', $class_id)->get();
+        $instructors = DB::table('instructors')->where('class_id', '=', $class_id)->whereNull('add_success')->get();
         foreach ($instructors as $item) {
             $instructor_mail = $item->email;
             $instructor_mail = strtolower($instructor_mail);
@@ -161,10 +168,13 @@ class MsController extends Controller
                 DB::table('instructors')->where('id', '=', $item->id)->update([
                     'add_success' => "success",
                 ]);
-                echo "success";
             } else {
                 //Fail
-                echo "fail";
+                $error = $response->json();
+                $message = $error['error']['message'];
+                DB::table('instructors')->where('id', '=', $item->id)->update([
+                    'add_success' => $message,
+                ]);
             }
         }
     }
@@ -340,7 +350,7 @@ class MsController extends Controller
                 $description = $class->getCourse->description;
                 dispatch(new CreateTeam($team_name, $class_id, $description));
             } catch (Exception $e) {
-                echo $class_id."<br>";
+                echo $class_id . "<br>";
             }
 
             // $this->createTeams($team_name, $section_id, $description);
@@ -358,7 +368,8 @@ class MsController extends Controller
     public function processQueueAddStudent()
     {
         $model = new MjuClass();
-        $all_class = $model->getClassStudentNull();
+        // $all_class = $model->getClassStudentNull();
+        $all_class = DB::table('view_students')->get();
         foreach ($all_class as $class) {
             $class_id = $class->class_id;
             $team_id = $class->team_id;
@@ -461,6 +472,21 @@ class MsController extends Controller
                 } else {
                     echo "Error adding event: $memberEventStatusCode\n";
                 }
+            }
+        }
+    }
+
+    public function addStudentToTean()
+    {
+        $students = DB::table('enrollments')->whereNull('add_success')->groupBy('class_id')->get();
+
+        foreach ($students as $student) {
+            $class_detail = DB::table('class')->where('class_id', '=', $student->class_id)->get();
+            $student_detail = DB::table('enrollments')->whereNull('add_success')->where('class_id', '=', $student->class_id)->get();
+
+            if(count($class_detail) == 0){
+                //ไม่มีห้องเรียน
+                dd( $class_detail);
             }
         }
     }

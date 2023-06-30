@@ -21,10 +21,10 @@ Route::get('/', function () {
 });
 
 
-Route::get('test',[MsController::class,'CreateEvent']);
+Route::get('test',[MsController::class,'addStudentToTean']);
 
 
-Route::get('team/token',[MsController::class,'getAccessToken']);
+Route::get('team/token',[MsController::class,'getAccessTokenDatabase']);
 
 Route::get('team/create',[MsController::class,'processQueueCreateTeam']);
 Route::get('team/student/add',[MsController::class,'processQueueAddStudent']);
