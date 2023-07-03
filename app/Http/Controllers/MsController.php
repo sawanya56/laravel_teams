@@ -7,6 +7,7 @@ use App\Jobs\AddStudentJob;
 use App\Jobs\CreateEventJob;
 use App\Jobs\CreateTeam;
 use App\Jobs\DeleteAllTeam;
+use App\Jobs\PostMessageToTeam;
 use App\Models\MjuClass;
 use DateTime;
 use Exception;
@@ -342,14 +343,14 @@ class MsController extends Controller
     {
         $all_class = MjuClass::whereNull('team_id')->groupBy('class_id')->get();
         foreach ($all_class as $class) {
-
             // dd($class->getCourse);
             try {
                 $team_name = $class->team_name;
                 $class_id = $class->class_id;
-                $description = $class->getCourse->description;
+                $description = "ความรู้เบื้องต้นเกี่ยวกับการออกแบบโรงงานอุตสาหกรรมชีวภาพ การเลือกทำเลที่ตั้ง หลักทั่วไปเกี่ยวกับการจัดวางผังโรงงาน การออกแบบและวิเคราะห์การไหล การวิเคราะห์ความสัมพันธ์ระหว่างหน่วยงาน การหาและจัดการเนื้อที่ หลักการวิเคราะห์การออกแบบเครื่องมือเฉพาะหน่วยงานการคิดต้นทุนการผลิต  และกระบวนการผลิตทางอุตสาหกรรมเทคโนโลยีชีวภาพที่สำคัญ";
                 dispatch(new CreateTeam($team_name, $class_id, $description));
             } catch (Exception $e) {
+                echo $e->getMessage();
                 echo $class_id . "<br>";
             }
 
@@ -367,8 +368,6 @@ class MsController extends Controller
 
     public function processQueueAddStudent()
     {
-        $model = new MjuClass();
-        // $all_class = $model->getClassStudentNull();
         $all_class = DB::table('view_students')->get();
         foreach ($all_class as $class) {
             $class_id = $class->class_id;
@@ -379,11 +378,14 @@ class MsController extends Controller
     public function processQueueAddInstructor()
     {
         $model = new MjuClass();
-        $all_class = $model->getClassInstructorNull();
+        // $all_class = $model->getClassInstructorNull();
+        $all_class = DB::table('class')->where('updated_at', 'like', '2023-07-03%')->groupBy('class_id')->get();
+        // dd($all_class);
         foreach ($all_class as $class) {
             $class_id = $class->class_id;
             $team_id = $class->team_id;
             dispatch(new AddInstructorJob($class_id, $team_id));
+
         }
     }
 
@@ -484,10 +486,59 @@ class MsController extends Controller
             $class_detail = DB::table('class')->where('class_id', '=', $student->class_id)->get();
             $student_detail = DB::table('enrollments')->whereNull('add_success')->where('class_id', '=', $student->class_id)->get();
 
-            if(count($class_detail) == 0){
+            if (count($class_detail) == 0) {
                 //ไม่มีห้องเรียน
-                dd( $class_detail);
+                dd($class_detail);
             }
         }
     }
+
+    public function addMe()
+    {
+        $access_token = $this->getAccessTokenDatabase();
+        $team_id = '410b69b7-c0ef-4444-83ad-b5004e440b26';
+        $instructor_mail = 'prasert_kb@mju.ac.th';
+        $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/owners/$ref';
+        $instructor_mail = "https://graph.microsoft.com/v1.0/users/" . $instructor_mail;
+        $response = Http::withToken($access_token)->post($url, [
+            "@odata.id" => $instructor_mail,
+
+        ]);
+    }
+
+    public function postMessageToTeam($team_id, $class_id)
+    {
+        $access_token = env('TOKEN');
+        $channel_id = $this->getChannel($team_id, $class_id);
+        $end_point = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/channels/" . $channel_id . "/messages";
+        $data = [
+            "subject" => "!! ประกาศ !!",
+            // "body" => $body_content,
+            "body" => [
+                "content" => "ห้องเรียน Microsoft Team ห้องนี้สร้างขึ้นเพื่อรองรับการเรียนออนไลน์ ในขณะนี้อยู่ระหว่างการเพิ่มอาจารย์เข้ามาในห้องเรียน",
+            ],
+        ];
+
+        $response = Http::withToken($access_token)->post($end_point, $data);
+
+        if ($response->successful()) {
+
+        } else {
+            echo "Error\n";
+        }
+
+    }
+
+    public function processQueuePostMessageToTeam()
+    {
+
+        $all_class = DB::table('class')->where('created_at', 'like', '2023-07-03%')->groupBy('class_id')->get();
+
+        foreach ($all_class as $class) {
+            $team_id = $class->team_id;
+            $class_id = $class->class_id;
+            dispatch(new PostMessageToTeam($team_id, $class_id));
+        }
+    }
+
 }
