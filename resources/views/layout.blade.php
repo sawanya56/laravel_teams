@@ -33,6 +33,17 @@
             $('#example').DataTable();
             $('#example2').DataTable();
         });
+
+        $('#btnDelete').click(function() {
+
+            let valid = confirm("Confirm ?");
+            if (valid == true) {
+                $('#formDelete').submit();
+            } else {
+                return false;
+                text = "You canceled!";
+            }
+        });
     </script>
 </body>
 

@@ -9,6 +9,34 @@
                     <h5>{{ $class_detail->calendar_subject }}</h5>
                     <h5>Team ID : {{ $class_detail->team_id }}</h5>
                     <h5>Channel ID : {{ $class_detail->channel_id }}</h5>
+                    <h5>CLASS ID : {{ $class_detail->class_id }}</h5>
+
+                    @foreach ($schedules as $item)
+                        <h5> day :{{ $item->week_of_day }} {{ $item->start_time }}</h5>
+                    @endforeach
+
+
+
+                    <div class="row">
+                        <div class="col-4">
+                            <a href="/main">
+                                <button class="btn btn-primary">BACK</button>
+                            </a>
+                        </div>
+                        <div class="col-4">
+
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-danger" id="btnDelete">DELETE TEAM WITH DATABASE</button>
+                            <form action="/team/delete/all" method="post" id="formDelete">
+                                <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
+                                <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
+                                @csrf
+                            </form>
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
         </div>

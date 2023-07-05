@@ -19,7 +19,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test', [MsController::class, 'addMe']);
+Route::get('test', [MsController::class, 'nun']);
 
 Route::get('team/token', [MsController::class, 'getAccessTokenDatabase']);
 
@@ -28,6 +28,7 @@ Route::get('team/student/add', [MsController::class, 'processQueueAddStudent']);
 Route::get('team/instructor/add', [MsController::class, 'processQueueAddInstructor']);
 Route::get('team/event/create', [MsController::class, 'porcessQueueCreateEvent']);
 Route::get('team/post/massage', [MsController::class, 'processQueuePostMessageToTeam']);
+Route::get('team/student/delete', [MsController::class, 'RemoveMember']);
 
 Route::get('groupmail', [MsController::class, 'getGroupmail']);
 
@@ -39,3 +40,5 @@ Route::get('/main', [MainController::class, 'main']);
 Route::get('/class/detail/{id}', [MainController::class, 'getClassDetail']);
 
 Route::post('/class/add/owner', [MainController::class, 'addOwner']);
+Route::post('/team/delete/all', [MainController::class, 'deleteTeam']);
+

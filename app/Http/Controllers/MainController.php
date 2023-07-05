@@ -29,7 +29,7 @@ class MainController extends Controller
             'instructors' => $ins,
             'students' => $students,
             'class_detail' => $class_detail,
-            'schedule' => $schedule,
+            'schedules' => $schedule,
         ]);
     }
 
@@ -50,18 +50,47 @@ class MainController extends Controller
 
         ]);
 
-        // $request->session()->flash('message', 'Add Success');
-        // $request->session()->flash('message', 'Add Success');
         if ($response->successful()) {
             // Success
-            DB::table('instructors')->where('id', '=', $class_id)->update([
+            DB::table('instructors')->where([
+                ['id', '=', $class_id],
+                ['email', '=', $request->email],
+            ])->update([
                 'add_success' => "success",
             ]);
+
+            $class = DB::table('class')->where('class_id', '=', $class_id)->first();
+            DB::table('instructors')->insert([
+                'year' => $class->year,
+                'term' => $class->term,
+                'course_code' => $class->course_code,
+                'class_id' => $class_id,
+                'section' => $class->section,
+                'email' => $request->email,
+                'add_by' => "nun",
+                'add_success' => "success",
+            ]);
+
+            $request->session()->flash('message', 'Add Success');
+            $request->session()->flash('alert', 'alert alert-success');
         } else {
+            $message = $response->json();
+            $request->session()->flash('message', 'Add Fail :' . $message['error']['message']);
+            $request->session()->flash('alert', 'alert alert-danger');
             //Fail
         }
 
         return redirect('/class/detail/' . $class_id);
+    }
+
+    public function deleteTeam(Request $request)
+    {
+        $team_id = $request->team_id;
+        $class_id = $request->class_id;
+        $model = new MsController();
+        $model->deleteTeamAndDatabase($team_id, $class_id);
+
+        return redirect('/main');
     }
 
 }
