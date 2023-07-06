@@ -112,7 +112,7 @@ class MsController extends Controller
     public function AddStudent($class_id, $team_id)
     {
 
-        $students = DB::table('enrollments')->where('class_id', '=', $class_id)->get();
+        $students = DB::table('enrollments')->where('class_id', '=', $class_id)->whereNull('add_success')->get();
         $access_token = $this->getAccessTokenDatabase();
 
         foreach ($students as $student) {
@@ -353,12 +353,12 @@ class MsController extends Controller
     public function processQueueCreateTeam()
     {
         $all_class = MjuClass::whereNull('team_id')->groupBy('class_id')->get();
+        // dd($all_class);
         foreach ($all_class as $class) {
-            // dd($class->getCourse);
             try {
                 $team_name = $class->team_name;
                 $class_id = $class->class_id;
-                $description = "ความรู้เบื้องต้นเกี่ยวกับการออกแบบโรงงานอุตสาหกรรมชีวภาพ การเลือกทำเลที่ตั้ง หลักทั่วไปเกี่ยวกับการจัดวางผังโรงงาน การออกแบบและวิเคราะห์การไหล การวิเคราะห์ความสัมพันธ์ระหว่างหน่วยงาน การหาและจัดการเนื้อที่ หลักการวิเคราะห์การออกแบบเครื่องมือเฉพาะหน่วยงานการคิดต้นทุนการผลิต  และกระบวนการผลิตทางอุตสาหกรรมเทคโนโลยีชีวภาพที่สำคัญ";
+                $description = "";
                 dispatch(new CreateTeam($team_name, $class_id, $description));
             } catch (Exception $e) {
                 echo $e->getMessage();
@@ -549,112 +549,43 @@ class MsController extends Controller
         }
     }
 
-    public function RemoveMember($team_id, $class_id)
+    public function removeStudentFromTeam($class_id)
     {
-        // $token = env('TOKEN');
-        // // ค้นหา ID ของห้องเรียน
-        // $classUrl = "https://graph.microsoft.com/v1.0/education/classes";
-        // $classResponse = Http::withToken($token)->get($classUrl);
-        // $classes = $classResponse->json()['value'] ?? [];
-
-        // $class = collect($classes)->first(function ($class) use ($class_id) {
-        //     return $class['externalId'] === $class_id;
-        // });
-
-        // if (!$class) {
-        //     echo "ไม่พบห้องเรียนที่มีรหัส $class_id";
-        //     exit();
-        // }
-
-        // $classTeamId = $class['classId'];
-
-        // // ดึงข้อมูลสมาชิกในทีม
-        // $getMembersUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id. "/members";
-        // $response = Http::withToken($token)->get($getMembersUrl);
-        // $members = $response->json()['value'] ?? [];
-
-        // $students = DB::table('enrollments')->where('student_mail', '=', $class_id)->get();
-        // // ค้นหาสมาชิกที่ต้องการลบออกจากทีมโดยใช้อีเมล
-        // $memberId = null;
-        // foreach ($members as $member) {
-        //     if (strtolower($member['email']) === strtolower($student_mail)) {
-        //         $memberId = $member['id'];
-        //         break;
-        //     }
-        // }
-
-        // // ลบสมาชิกออกจากทีม
-        // if ($memberId) {
-        //     $removeMemberUrl = "https://graph.microsoft.com/v1.0/teams/". $team_id ."/members/$memberId/microsoft.graph.removeMember";
-        //     $response = Http::withToken($token)->post($removeMemberUrl);
-
-        //     if ($response->status() === 204) {
-        //         echo "ลบสมาชิก $student_mail ออกจากทีมสำเร็จแล้ว";
-        //     } else {
-        //         echo "เกิดข้อผิดพลาดในการลบสมาชิกออกจากทีม";
-        //         print_r($response->json());
-        //     }
-        // } else {
-        //     echo "ไม่พบสมาชิกที่มีอีเมล $student_maill ในทีม";
-        // }
-    }
-
-    public function removeStudent($team_id, $student_array)
-    {
-
-        // ดึงข้อมูลสมาชิกในทีม
         $token = $this->getAccessTokenDatabase();
-        $getMembersUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members";
-        $response = Http::withToken($token)->get($getMembersUrl);
-        $members = $response->json()['value'] ?? [];
-
-        $students = DB::table('drops')->where('student_mail', '=', $class_id)->get();
-        // ค้นหาสมาชิกที่ต้องการลบออกจากทีมโดยใช้อีเมล
-        $memberId = null;
-        foreach ($members as $member) {
-            if (strtolower($member['email']) === strtolower($student_mail)) {
-                $memberId = $member['id'];
-                break;
-            }
+        $class = DB::table('class')->where('class_id', '=', $class_id)->first();
+        if ($class == null) {
+            DB::table('drops')->where('class_id', '=', $class_id)->update([
+                'remove_success' => "class id null",
+            ]);
+            return 0;
         }
-
-        // // ลบสมาชิกออกจากทีม
-        // if ($memberId) {
-        //     $removeMemberUrl = "https://graph.microsoft.com/v1.0/teams/". $team_id ."/members/$memberId/microsoft.graph.removeMember";
-        //     $response = Http::withToken($token)->post($removeMemberUrl);
-
-        //     if ($response->status() === 204) {
-        //         echo "ลบสมาชิก $student_mail ออกจากทีมสำเร็จแล้ว";
-        //     } else {
-        //         echo "เกิดข้อผิดพลาดในการลบสมาชิกออกจากทีม";
-        //         print_r($response->json());
-        //     }
-        // } else {
-        //     echo "ไม่พบสมาชิกที่มีอีเมล $student_maill ในทีม";
-        // } https://teams.microsoft.com/l/channel/19%3a_oWc56ARnNVeSJA_QqBZMzSIemND1TwzDYIE_8eG4UY1%40thread.tacv2/General?groupId=000af4fc-124e-4884-b1ec-07f69488231b&tenantId=8ec74a39-ddf6-41e1-b0a2-ff0459ea8eb8
-    }
-
-    public function removeStudentFromTeam($team_id, $student_mail, $id)
-    {
-        $token = $this->getAccessTokenDatabase();
+        $team_id = $class->team_id;
         $getMembersUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members";
         $response = Http::withToken($token)->get($getMembersUrl);
         $members = $response->json()['value'] ?? [];
         $memberId = null;
-        foreach ($members as $member) {
-            if (strtolower($member['email']) === strtolower($student_mail)) {
-                $removeMemberUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members/$memberId/microsoft.graph.removeMember";
-                $response = Http::withToken($token)->post($removeMemberUrl);
-                if ($response->status() === 204) {
-                    DB::table('drops')->where('id', '=', $id)->update([
-                        'remove_success' => "success"
-                    ]);
-                } else {
-                    DB::table('drops')->where('id', '=', $id)->update([
-                        'remove_success' => json_encode($response->json())
-                    ]);
+
+        $students = DB::table('drops')->where('class_id', '=', $class_id)->get();
+
+        foreach ($students as $student) {
+            $student_mail = $student->student_mail;
+            $id = $student->id;
+            foreach ($members as $member) {
+                if (strtolower($member['email']) === strtolower($student_mail)) {
+                    $memberId = $member['id'];
+                    $removeMemberUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members/" . $memberId;
+                    $response = Http::withToken($token)->delete($removeMemberUrl);
+                    if ($response->status() === 204) {
+                        DB::table('drops')->where('id', '=', $id)->update([
+                            'remove_success' => "success",
+                        ]);
+                        echo $team_id . ":" . $student_mail . "\n";
+                    } else {
+                        DB::table('drops')->where('id', '=', $id)->update([
+                            'remove_success' => json_encode($response->json()),
+                        ]);
+                    }
                 }
-                break;
             }
         }
     }

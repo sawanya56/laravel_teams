@@ -20,7 +20,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test', [MsController::class, 'getStudentMemberId']);
+Route::get('test', [MsController::class, 'removeStudentFromTeam']);
 
 Route::get('team/token', [MsController::class, 'getAccessTokenDatabase']);
 

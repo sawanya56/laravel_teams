@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\AddStudentJob;
-use Illuminate\Http\Request;
+use App\Jobs\RemoveStudentJob;
 use Illuminate\Support\Facades\DB;
 
 class AddDropController extends Controller
@@ -34,20 +34,9 @@ class AddDropController extends Controller
 
     public function dropStudent()
     {
-        $students = DB::table($this->table_drop)->whereNull('remove_success')->get();
-        foreach ($students as $student) {
-            $class_id = $student->class_id;
-            $class_detail = DB::table('class')->where('class_id', '=', $class_id)->first();
-            if ($class_detail != null) {
-
-                $team_id = $class_detail->team_id;
-                if ($team_id != null) {
-                    $model = new MsController();
-                    $model->getStudentMemberId($team_id, $student->student_id, $student->id);
-                } else {
-                }
-            } else {
-            }
+        $class_list = DB::table($this->table_drop)->whereNull('remove_success')->groupBy('class_id')->get();
+        foreach ($class_list as $class) {
+            dispatch(new RemoveStudentJob($class->class_id));
         }
     }
 }

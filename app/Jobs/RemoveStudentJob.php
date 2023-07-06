@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Http\Controllers\MsController;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -17,14 +16,12 @@ class RemoveStudentJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    private $team_id;
-    private $mail;
-    private $id;
-    public function __construct($team_id, $student_mail, $id)
+
+    private $class_id;
+    public function __construct($class_id)
     {
-        $this->team_id = $team_id;
-        $this->mail = $student_mail;
-        $this->id = $id;
+        $this->class_id = $class_id;
+
     }
 
     /**
@@ -33,6 +30,6 @@ class RemoveStudentJob implements ShouldQueue
     public function handle(): void
     {
         $job = new MsController();
-        $job->removeStudentFromTeam($this->team_id, $this->mail, $this->id);
+        $job->removeStudentFromTeam($this->class_id);
     }
 }
