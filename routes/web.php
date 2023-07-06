@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddDropController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MsController;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +20,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test', [MsController::class, 'nun']);
+Route::get('test', [MsController::class, 'getStudentMemberId']);
 
 Route::get('team/token', [MsController::class, 'getAccessTokenDatabase']);
 
@@ -42,3 +43,6 @@ Route::get('/class/detail/{id}', [MainController::class, 'getClassDetail']);
 Route::post('/class/add/owner', [MainController::class, 'addOwner']);
 Route::post('/team/delete/all', [MainController::class, 'deleteTeam']);
 
+
+Route::get('/adddrop/add', [AddDropController::class, 'addStudent']);
+Route::get('/adddrop/drop', [AddDropController::class, 'dropStudent']);
