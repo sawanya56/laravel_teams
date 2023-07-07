@@ -43,6 +43,9 @@ Route::get('/class/detail/{id}', [MainController::class, 'getClassDetail']);
 Route::post('/class/add/owner', [MainController::class, 'addOwner']);
 Route::post('/team/delete/all', [MainController::class, 'deleteTeam']);
 
+Route::get('/class/create', [MainController::class, 'getClassCreate']);
+Route::post('/class/create', [MainController::class, 'postClassCreate']);
+
 
 Route::get('/adddrop/add', [AddDropController::class, 'addStudent']);
 Route::get('/adddrop/drop', [AddDropController::class, 'dropStudent']);

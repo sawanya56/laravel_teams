@@ -369,6 +369,7 @@ class MsController extends Controller
         }
     }
 
+
     public function porcessQueueCreateEvent()
     {
         $all_class = DB::table('class')->select('class_id', 'team_id')->whereNotNull('team_id')->whereNull('add_event')->groupBy('class_id')->get();
