@@ -310,14 +310,24 @@ class MsController extends Controller
                     'add_event' => $response_data['error']
                 ]);
             } else {
-                echo $class->id . '<br>';
+                echo "Add Success : " . $class->id . '\n';
                 //Create Success
                 $event_id = $response['id'];
                 $body_content = $response['body'];
                 DB::table('class')->where('id', '=', $class->id)->update([
                     'event_id' => $event_id,
+                    'event_body' => json_encode($body_content)
                 ]);
-                $this->postMeetingToTeam($team_id, $channel_id, $body_content, $team_name);
+                $post_result = $this->postMeetingToTeam($team_id, $channel_id, $body_content, $team_name);
+                if ($post_result === true) {
+                    DB::table('class')->where('id', '=', $class->id)->update([
+                        'add_post' => 'success',
+                    ]);
+                } else {
+                    DB::table('class')->where('id', '=', $class->id)->update([
+                        'add_post' => $post_result,
+                    ]);
+                }
             }
         }
     }
@@ -358,10 +368,14 @@ class MsController extends Controller
             "body" => $body_content,
         ];
         $response = Http::withToken($access_token)->post($end_point, $data);
+
         if ($response->successful()) {
             echo "POST : SUCCESS\n";
+            return true;
         } else {
-            echo "POST : FAIL\n";
+            $error_message = $response->json()['error']['message'] ?? 'Unknown error occurred';
+            echo "POST : FAIL : " . $error_message . "\n";
+            return $error_message;
         }
     }
 
