@@ -316,7 +316,8 @@ class MsController extends Controller
                 $body_content = $response['body'];
                 DB::table('class')->where('id', '=', $class->id)->update([
                     'event_id' => $event_id,
-                    'event_body' => json_encode($body_content)
+                    'event_body' => json_encode($body_content),
+                    'add_event' => 'success'
                 ]);
                 $post_result = $this->postMeetingToTeam($team_id, $channel_id, $body_content, $team_name);
                 if ($post_result === true) {
@@ -639,7 +640,7 @@ class MsController extends Controller
     {
         $all_class = DB::table('class')->whereNull('group_mail')->groupBy('class_id')->get();
         foreach ($all_class as $class) {
-            dispatch(new GetGroupMailAndChannelIdJob($class->class_id));
+            dispatch(new GetGroupMailAndChannelIdJob($class->class_id,$class->team_id));
         }
     }
 }
