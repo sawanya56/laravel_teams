@@ -208,12 +208,14 @@ class MsController extends Controller
         return $channel_id;
     }
 
-    public function CreateEvent($class_id)
+    public function CreateEvent($class_id = '64a7d1cf7857988')
     {
         $all_class = DB::table('class')->where('class_id', '=', $class_id)->get();
         foreach ($all_class as $class) {
             $team_id = $class->team_id;
             $class_id = $class->class_id;
+            $team_name = $class->team_name;
+
             $group_mail = $this->getGroupmail($team_id, $class_id);
             $channel_id = $this->getChannel($team_id, $class_id);
 
@@ -229,6 +231,8 @@ class MsController extends Controller
                 $study_time = $this->calculateEndTime($start_time, $dulation_time);
                 $start_date_time = $start_date . 'T' . $study_time['start_time'];
                 $end_date_time = $start_date . 'T' . $study_time['end_time'];
+
+               
 
                 $day = strtoupper($row->week_of_day);
                 $days_of_week = $this->week_of_day[$day];
@@ -285,16 +289,18 @@ class MsController extends Controller
                 $response_data = $response->json();
 
                 if (isset($response_data['error'])) {
+                    DB::table('class')->where('class_id', '=', $class_id)->update([
+                        'add_event' => $response_data['error']
+                    ]);
                 } else {
                     //Create Success
                     $event_id = $response['id'];
 
                     $body_content = $response['body'];
-                    // dd($body_content);
                     DB::table('class')->where('id', '=', $row->id)->update([
                         'event_id' => $event_id,
                     ]);
-                    $this->postMeetingToTeam($team_id, $channel_id, $body_content);
+                    $this->postMeetingToTeam($team_id, $channel_id, $body_content,$team_name);
                 }
             }
         }
@@ -327,16 +333,20 @@ class MsController extends Controller
         DB::commit();
     }
 
-    public function postMeetingToTeam($team_id, $channel_id, $body_content)
+    public function postMeetingToTeam($team_id, $channel_id, $body_content,$team_name)
     {
         $access_token = env('TOKEN');
         $end_point = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/channels/" . $channel_id . "/messages";
         $data = [
-            "subject" => "New Message Title",
+            "subject" => $team_name,
             "body" => $body_content,
         ];
         $response = Http::withToken($access_token)->post($end_point, $data);
-        dd($response->json());
+        if($response->successful()){
+            echo "POST : SUCCESS\n";
+        }else{
+            echo "POST : FAIL\n";
+        }
     }
 
     //----------------------------------------- QUEUE -----------------------------------------------//
@@ -369,10 +379,14 @@ class MsController extends Controller
         }
     }
 
-
     public function porcessQueueCreateEvent()
     {
-        $all_class = DB::table('class')->select('class_id', 'team_id')->whereNotNull('team_id')->whereNull('add_event')->groupBy('class_id')->get();
+        $all_class = DB::table('class')->select('class_id', 'team_id')
+            ->whereNotNull('team_id')
+            ->whereNull('add_event')
+            ->groupBy('class_id')
+            ->limit(5)
+            ->get();
         foreach ($all_class as $class) {
             dispatch(new CreateEventJob($class->class_id));
         }
@@ -566,7 +580,7 @@ class MsController extends Controller
         $members = $response->json()['value'] ?? [];
         $memberId = null;
 
-        $students = DB::table('drops')->where('class_id', '=', $class_id)->get();
+        $students = DB::table('drops')->where('class_id', '=', $class_id)->whereNull('remove_success')->get();
 
         foreach ($students as $student) {
             $student_mail = $student->student_mail;
