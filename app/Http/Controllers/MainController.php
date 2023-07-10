@@ -97,9 +97,9 @@ class MainController extends Controller
 
         $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
         $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
+      
         $response = Http::withToken($access_token)->post($url, [
             "@odata.id" => $student_mail,
-
         ]);
 
         if ($response->successful()) {
@@ -118,7 +118,7 @@ class MainController extends Controller
                 'course_code' => $class->course_code,
                 'class_id' => $class_id,
                 'section' => $class->section,
-                'email' => $request->student_mail,
+                'student_mail' => $request->student_mail,
                 'add_by' => "nun",
                 'add_success' => "success",
             ]);

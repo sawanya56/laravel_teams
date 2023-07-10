@@ -50,12 +50,13 @@
             @endif
             <div class="card">
                 <div class="card-body">
+                    <h4>Instructor</h4>
                     <form method="post" action="/class/add/owner">
                         @csrf
                         <div class="form-group">
                             <label for="exampleInputEmail1">Email address</label>
                             <input type="email" name="email" class="form-control" id="exampleInputEmail1"
-                                aria-describedby="emailHelp">
+                                aria-describedby="emailHelp" placeholder="Enter email">
                             <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
                             <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
                         </div>
@@ -63,7 +64,7 @@
                     </form>
                 </div>
                 <div class="card-body">
-                    <h4>ins</h4>
+
                     <table class="table" id="example">
                         <thead>
                             <tr>
@@ -89,6 +90,19 @@
             <div class="card">
                 <div class="card-body">
                     <h4>Student</h4>
+                    <form method="post" action="/class/add/owner">
+                        @csrf
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Email address</label>
+                            <input type="email" name="email" class="form-control" id="exampleInputEmail1"
+                                aria-describedby="emailHelp" placeholder="Enter email">
+                            <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
+                            <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </form>
+                </div>
+                <div class="card-body">
                     <table class="table" id="example2">
                         <thead>
                             <tr>
@@ -102,7 +116,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $row->student_mail }}</td>
-                                    <td>{{ $row->add_success }}</td>
+                                    <td style="color: green">{{ $row->add_success }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -111,4 +125,5 @@
             </div>
         </div>
     </div>
+   
 @endsection

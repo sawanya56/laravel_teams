@@ -248,7 +248,7 @@ class MsController extends Controller
             $start_date_time = $start_date . 'T' . $study_time['start_time'];
             $end_date_time = $start_date . 'T' . $study_time['end_time'];
 
-
+            $text_time = $study_time['start_time'] . "-" . $study_time['end_time'];
 
             $day = strtoupper($class->week_of_day);
             $days_of_week = $this->week_of_day[$day];
@@ -257,7 +257,7 @@ class MsController extends Controller
                 "subject" => $class->calendar_subject,
                 "body" => [
                     "contentType" => "html",
-                    "content" => $class->study_type,
+                    "content" => $class->study_type . " : " . $class->week_of_day . " : " . $text_time,
                 ],
                 "start" => [
                     "dateTime" => $start_date_time,
@@ -309,8 +309,11 @@ class MsController extends Controller
                 DB::table('class')->where('class_id', '=', $class_id)->update([
                     'add_event' => $response_data['error']
                 ]);
+
+                //Delete All Job
+                DB::table('jobs')->truncate();
             } else {
-                echo "Add Success : " . $class->id . '\n';
+                echo "Add Success : " . $class->class_id . "\n";
                 //Create Success
                 $event_id = $response['id'];
                 $body_content = $response['body'];
@@ -416,7 +419,6 @@ class MsController extends Controller
             ->whereNotNull('team_id')
             ->whereNull('add_event')
             ->groupBy('class_id')
-            ->limit(5)
             ->get();
         foreach ($all_class as $class) {
             dispatch(new CreateEventJob($class->class_id));
