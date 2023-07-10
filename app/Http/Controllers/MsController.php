@@ -226,16 +226,17 @@ class MsController extends Controller
         }
     }
 
-    public function CreateEvent($class_id = '64a7d1cf7857988')
+    public function CreateEvent($class_id)
     {
         $all_class = DB::table('class')->where('class_id', '=', $class_id)->get();
         foreach ($all_class as $class) {
             $team_id = $class->team_id;
             $class_id = $class->class_id;
             $team_name = $class->team_name;
-
-            $group_mail = $this->getGroupmail($team_id, $class_id);
-            $channel_id = $this->getChannel($team_id, $class_id);
+            $group_mail = $class->group_mail;
+            $channel_id = $class->channel_id;
+            // $group_mail = $this->getGroupmail($team_id, $class_id);
+            // $channel_id = $this->getChannel($team_id, $class_id);
 
             $start_date = '2023-07-03';
             $end_date = '2023-11-06';
@@ -312,12 +313,11 @@ class MsController extends Controller
                 echo $class->id . '<br>';
                 //Create Success
                 $event_id = $response['id'];
-
                 $body_content = $response['body'];
                 DB::table('class')->where('id', '=', $class->id)->update([
                     'event_id' => $event_id,
                 ]);
-                // $this->postMeetingToTeam($team_id, $channel_id, $body_content,$team_name);
+                $this->postMeetingToTeam($team_id, $channel_id, $body_content, $team_name);
             }
         }
     }
