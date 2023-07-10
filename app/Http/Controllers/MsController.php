@@ -7,6 +7,7 @@ use App\Jobs\AddStudentJob;
 use App\Jobs\CreateEventJob;
 use App\Jobs\CreateTeam;
 use App\Jobs\DeleteAllTeam;
+use App\Jobs\GetGroupMailAndChannelIdJob;
 use App\Jobs\PostMessageToTeam;
 use App\Models\MjuClass;
 use DateTime;
@@ -180,32 +181,49 @@ class MsController extends Controller
         }
     }
 
-    public function getGroupmail($team_id, $class_id)
+    public function getGroupmail($team_id, $class_id, $access_token)
     {
-        $access_token = $this->getAccessTokenDatabase();
+        // $access_token = $this->getAccessTokenDatabase();
         $endpoint = "https://graph.microsoft.com/v1.0/groups/ " . $team_id;
         $endpoint = str_replace(" ", "", $endpoint);
         $response = Http::withToken($access_token)->get($endpoint);
-        $mail = $response->json();
-
-        DB::table('class')->where('class_id', '=', $class_id)->update([
-            'group_mail' => $mail['mail'],
-        ]);
-        return $mail['mail'];
+        if ($response->successful()) {
+            $mail = $response->json();
+            DB::table('class')->where('class_id', '=', $class_id)->update([
+                'group_mail' => $mail['mail'],
+            ]);
+            echo "Get Group Mail : Success\n";
+            return $mail['mail'];
+        } else {
+            $error_message = $response->json()['error']['message'] ?? 'Unknown error occurred';
+            DB::table('class')->where('class_id', '=', $class_id)->update([
+                'group_mail' => $error_message,
+            ]);
+            echo "Get Group Mail : Fail" . $error_message . "\n";
+        }
     }
 
-    public function getChannel($team_id, $class_id)
+    public function getChannel($team_id, $class_id, $access_token)
     {
-        $access_token = $this->getAccessTokenDatabase();
+        // $access_token = $this->getAccessTokenDatabase();
         $endpoint = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/channels";
         $endpoint = str_replace(" ", "", $endpoint);
         $response = Http::withToken($access_token)->get($endpoint);
-        $channel_id = $response->json();
-        $channel_id = $channel_id['value'][0]['id'];
-        DB::table('class')->where('class_id', '=', $class_id)->update([
-            'channel_id' => $channel_id,
-        ]);
-        return $channel_id;
+        if ($response->successful()) {
+            $channel_id = $response->json();
+            $channel_id = $channel_id['value'][0]['id'];
+            DB::table('class')->where('class_id', '=', $class_id)->update([
+                'channel_id' => $channel_id,
+            ]);
+            echo "Get Channel ID : Success\n";
+            return $channel_id;
+        } else {
+            $error_message = $response->json()['error']['message'] ?? 'Unknown error occurred';
+            DB::table('class')->where('class_id', '=', $class_id)->update([
+                'channel_id' => $error_message,
+            ]);
+            echo "Get Channel ID : Fail : " . $error_message . "\n";
+        }
     }
 
     public function CreateEvent($class_id = '64a7d1cf7857988')
@@ -222,86 +240,84 @@ class MsController extends Controller
             $start_date = '2023-07-03';
             $end_date = '2023-11-06';
 
-            $class_infomation = DB::table('class')->where('class_id', '=', $class_id)->get();
             $days_of_week = [];
-            foreach ($class_infomation as $row) {
+            $start_time = $class->start_time;
+            $dulation_time = $class->duration_time;
+            $study_time = $this->calculateEndTime($start_time, $dulation_time);
+            $start_date_time = $start_date . 'T' . $study_time['start_time'];
+            $end_date_time = $start_date . 'T' . $study_time['end_time'];
 
-                $start_time = $row->start_time;
-                $dulation_time = $row->duration_time;
-                $study_time = $this->calculateEndTime($start_time, $dulation_time);
-                $start_date_time = $start_date . 'T' . $study_time['start_time'];
-                $end_date_time = $start_date . 'T' . $study_time['end_time'];
 
-               
 
-                $day = strtoupper($row->week_of_day);
-                $days_of_week = $this->week_of_day[$day];
-                $data = [
+            $day = strtoupper($class->week_of_day);
+            $days_of_week = $this->week_of_day[$day];
+            $data = [
 
-                    "subject" => $class->calendar_subject,
-                    "body" => [
-                        "contentType" => "html",
-                        "content" => $row->study_type,
+                "subject" => $class->calendar_subject,
+                "body" => [
+                    "contentType" => "html",
+                    "content" => $class->study_type,
+                ],
+                "start" => [
+                    "dateTime" => $start_date_time,
+                    "timeZone" => "Asia/Bangkok",
+                ],
+                "end" => [
+                    "dateTime" => $end_date_time,
+                    "timeZone" => "Asia/Bangkok",
+                ],
+                "location" => [
+                    "displayName" => $class->room_name,
+                ],
+                "attendees" => [
+                    [
+                        "emailAddress" => [
+                            "address" => $group_mail,
+                            "name" => "GROUP MAIL",
+                        ],
+                        "type" => "required",
                     ],
-                    "start" => [
-                        "dateTime" => $start_date_time,
-                        "timeZone" => "Asia/Bangkok",
-                    ],
-                    "end" => [
-                        "dateTime" => $end_date_time,
-                        "timeZone" => "Asia/Bangkok",
-                    ],
-                    "location" => [
-                        "displayName" => $row->room_name,
-                    ],
-                    "attendees" => [
-                        [
-                            "emailAddress" => [
-                                "address" => $group_mail,
-                                "name" => "GROUP MAIL",
-                            ],
-                            "type" => "required",
+                ],
+                "isOnlineMeeting" => true,
+                "onlineMeetingProvider" => "teamsForBusiness",
+                "recurrence" => [
+                    "pattern" => [
+                        "type" => "weekly",
+                        "interval" => 1,
+                        "daysOfWeek" => [
+                            $days_of_week,
                         ],
                     ],
-                    "isOnlineMeeting" => true,
-                    "onlineMeetingProvider" => "teamsForBusiness",
-                    "recurrence" => [
-                        "pattern" => [
-                            "type" => "weekly",
-                            "interval" => 1,
-                            "daysOfWeek" => [
-                                $days_of_week,
-                            ],
-                        ],
-                        "range" => [
-                            "type" => "endDate",
-                            "startDate" => $start_date,
-                            "endDate" => $end_date,
-                        ],
+                    "range" => [
+                        "type" => "endDate",
+                        "startDate" => $start_date,
+                        "endDate" => $end_date,
                     ],
-                ];
+                ],
+            ];
 
-                //OWNER ACCESS TOKEN
-                $token = env('TOKEN');
-                $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
+            //OWNER ACCESS TOKEN
+            $token = env('TOKEN');
+            // $token = $this->getAccessTokenDatabase();
+            $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
 
-                $response = Http::withToken($token)->post($endpoint, $data);
-                $response_data = $response->json();
+            $response = Http::withToken($token)->post($endpoint, $data);
+            $response_data = $response->json();
 
-                if (isset($response_data['error'])) {
-                    DB::table('class')->where('class_id', '=', $class_id)->update([
-                        'add_event' => $response_data['error']
-                    ]);
-                } else {
-                    //Create Success
-                    $event_id = $response['id'];
+            if (isset($response_data['error'])) {
+                DB::table('class')->where('class_id', '=', $class_id)->update([
+                    'add_event' => $response_data['error']
+                ]);
+            } else {
+                echo $class->id . '<br>';
+                //Create Success
+                $event_id = $response['id'];
 
-                    $body_content = $response['body'];
-                    DB::table('class')->where('id', '=', $row->id)->update([
-                        'event_id' => $event_id,
-                    ]);
-                    $this->postMeetingToTeam($team_id, $channel_id, $body_content,$team_name);
-                }
+                $body_content = $response['body'];
+                DB::table('class')->where('id', '=', $class->id)->update([
+                    'event_id' => $event_id,
+                ]);
+                // $this->postMeetingToTeam($team_id, $channel_id, $body_content,$team_name);
             }
         }
     }
@@ -333,7 +349,7 @@ class MsController extends Controller
         DB::commit();
     }
 
-    public function postMeetingToTeam($team_id, $channel_id, $body_content,$team_name)
+    public function postMeetingToTeam($team_id, $channel_id, $body_content, $team_name)
     {
         $access_token = env('TOKEN');
         $end_point = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/channels/" . $channel_id . "/messages";
@@ -342,9 +358,9 @@ class MsController extends Controller
             "body" => $body_content,
         ];
         $response = Http::withToken($access_token)->post($end_point, $data);
-        if($response->successful()){
+        if ($response->successful()) {
             echo "POST : SUCCESS\n";
-        }else{
+        } else {
             echo "POST : FAIL\n";
         }
     }
@@ -605,15 +621,11 @@ class MsController extends Controller
         }
     }
 
-    public function nun()
+    public function getGroupMailAndChannelId()
     {
-        $class = DB::table('class')->whereIn('class_id', [
-            888888, 777777, 666666, 555555,
-        ])->groupBy('class_id')->get();
-
-        foreach ($class as $row) {
-            // dd($row);
-            $class_old = explode(':', $row->remark);
+        $all_class = DB::table('class')->whereNull('group_mail')->groupBy('class_id')->get();
+        foreach ($all_class as $class) {
+            dispatch(new GetGroupMailAndChannelIdJob($class->class_id));
         }
     }
 }
