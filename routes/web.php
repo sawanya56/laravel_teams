@@ -45,7 +45,11 @@ Route::post('/team/delete/all', [MainController::class, 'deleteTeam']);
 
 Route::get('/class/create', [MainController::class, 'getClassCreate']);
 Route::post('/class/create', [MainController::class, 'postClassCreate']);
+Route::post('/class/add/student', [MainController::class, 'postAddStudent']);
+Route::post('/class/remove/student', [MainController::class, 'postRemoveStudent']);
 
 
 Route::get('/adddrop/add', [AddDropController::class, 'addStudent']);
 Route::get('/adddrop/drop', [AddDropController::class, 'dropStudent']);
+
+Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);

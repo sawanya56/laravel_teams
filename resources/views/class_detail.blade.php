@@ -41,13 +41,17 @@
             </div>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col-6">
+    <div class="row">
+        <div class="col-12">
             @if (Session::has('message'))
                 <div class="{{ Session::get('alert') }}" role="alert">
                     {{ Session::get('message') }}
                 </div>
             @endif
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-6">
             <div class="card">
                 <div class="card-body">
                     <h4>Instructor</h4>
@@ -71,6 +75,7 @@
                                 <th>No</th>
                                 <th>Mail</th>
                                 <th>Add Success</th>
+                                <th>Button</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -79,6 +84,7 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $row->email }}</td>
                                     <td style="color: green">{{ $row->add_success }}</td>
+                                    <td><button class="btn btn-danger">remove</button></td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -90,7 +96,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4>Student</h4>
-                    <form method="post" action="/class/add/owner">
+                    <form method="post" action="/class/add/student">
                         @csrf
                         <div class="form-group">
                             <label for="exampleInputEmail1">Email address</label>
@@ -109,6 +115,7 @@
                                 <th>No</th>
                                 <th>Mail</th>
                                 <th>Add_success</th>
+                                <th>Button</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -117,6 +124,16 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $row->student_mail }}</td>
                                     <td style="color: green">{{ $row->add_success }}</td>
+                                    <td style="color: green">
+                                        <form action="/class/remove/student" method="post"
+                                            onsubmit="return confirm('ลบไหม?');">
+                                            @csrf
+                                            <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
+                                            <input type="hidden" name="class_id" value="{{ $row->class_id }}">
+                                            <input type="hidden" name="email" value="{{ $row->student_mail }}">
+                                            <button type="submit" class="btn btn-danger">Remove</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -125,5 +142,4 @@
             </div>
         </div>
     </div>
-   
 @endsection

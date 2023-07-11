@@ -14,6 +14,7 @@ use DateTime;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class MsController extends Controller
 {
@@ -67,15 +68,15 @@ class MsController extends Controller
     public function getAccessTokenDatabase()
     {
         return $this->getAccessToken();
-        $model = DB::table('settings')->orderBy('id', 'desc')->first();
-        $access_token = null;
-        if ($model == null) {
-            $access_token = $this->getAccessToken();
-        } else {
-            $access_token = $model->access_token;
-        }
+        // $model = DB::table('settings')->orderBy('id', 'desc')->first();
+        // $access_token = null;
+        // if ($model == null) {
+        //     $access_token = $this->getAccessToken();
+        // } else {
+        //     $access_token = $model->access_token;
+        // }
 
-        return $access_token;
+        // return $access_token;
     }
 
     public function CreateTeams($team_name, $class_id, $description)
@@ -230,108 +231,134 @@ class MsController extends Controller
     {
         $all_class = DB::table('class')->where('class_id', '=', $class_id)->get();
         foreach ($all_class as $class) {
-            $team_id = $class->team_id;
-            $class_id = $class->class_id;
-            $team_name = $class->team_name;
-            $group_mail = $class->group_mail;
-            $channel_id = $class->channel_id;
-            // $group_mail = $this->getGroupmail($team_id, $class_id);
-            // $channel_id = $this->getChannel($team_id, $class_id);
 
-            $start_date = '2023-07-03';
-            $end_date = '2023-11-06';
+            try {
 
-            $days_of_week = [];
-            $start_time = $class->start_time;
-            $dulation_time = $class->duration_time;
-            $study_time = $this->calculateEndTime($start_time, $dulation_time);
-            $start_date_time = $start_date . 'T' . $study_time['start_time'];
-            $end_date_time = $start_date . 'T' . $study_time['end_time'];
+                $team_id = $class->team_id;
+                $class_id = $class->class_id;
+                $team_name = $class->team_name;
+                $group_mail = $class->group_mail;
+                $channel_id = $class->channel_id;
+                // $group_mail = $this->getGroupmail($team_id, $class_id);
+                // $channel_id = $this->getChannel($team_id, $class_id);
 
-            $text_time = $study_time['start_time'] . "-" . $study_time['end_time'];
+                $start_date = '2023-07-03';
+                $end_date = '2023-11-06';
 
-            $day = strtoupper($class->week_of_day);
-            $days_of_week = $this->week_of_day[$day];
-            $data = [
+                // $days_of_week = [];
+                $start_time = $class->start_time;
+                $dulation_time = $class->duration_time;
+                $study_time = $this->calculateEndTime($start_time, $dulation_time);
+                $start_date_time = $start_date . 'T' . $study_time['start_time'];
+                $end_date_time = $start_date . 'T' . $study_time['end_time'];
 
-                "subject" => $class->calendar_subject,
-                "body" => [
-                    "contentType" => "html",
-                    "content" => $class->study_type . " : " . $class->week_of_day . " : " . $text_time,
-                ],
-                "start" => [
-                    "dateTime" => $start_date_time,
-                    "timeZone" => "Asia/Bangkok",
-                ],
-                "end" => [
-                    "dateTime" => $end_date_time,
-                    "timeZone" => "Asia/Bangkok",
-                ],
-                "location" => [
-                    "displayName" => $class->room_name,
-                ],
-                "attendees" => [
-                    [
-                        "emailAddress" => [
-                            "address" => $group_mail,
-                            "name" => "GROUP MAIL",
-                        ],
-                        "type" => "required",
-                    ],
-                ],
-                "isOnlineMeeting" => true,
-                "onlineMeetingProvider" => "teamsForBusiness",
-                "recurrence" => [
-                    "pattern" => [
-                        "type" => "weekly",
-                        "interval" => 1,
-                        "daysOfWeek" => [
-                            $days_of_week,
-                        ],
-                    ],
-                    "range" => [
-                        "type" => "endDate",
-                        "startDate" => $start_date,
-                        "endDate" => $end_date,
-                    ],
-                ],
-            ];
+                $text_time = $study_time['start_time'] . "-" . $study_time['end_time'];
 
-            //OWNER ACCESS TOKEN
-            $token = env('TOKEN');
-            // $token = $this->getAccessTokenDatabase();
-            $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
-
-            $response = Http::withToken($token)->post($endpoint, $data);
-            $response_data = $response->json();
-
-            if (isset($response_data['error'])) {
-                DB::table('class')->where('class_id', '=', $class_id)->update([
-                    'add_event' => $response_data['error']
-                ]);
-
-                //Delete All Job
-                DB::table('jobs')->truncate();
-            } else {
-                echo "Add Success : " . $class->class_id . "\n";
-                //Create Success
-                $event_id = $response['id'];
-                $body_content = $response['body'];
-                DB::table('class')->where('id', '=', $class->id)->update([
-                    'event_id' => $event_id,
-                    'event_body' => json_encode($body_content),
-                    'add_event' => 'success'
-                ]);
-                $post_result = $this->postMeetingToTeam($team_id, $channel_id, $body_content, $team_name);
-                if ($post_result === true) {
-                    DB::table('class')->where('id', '=', $class->id)->update([
-                        'add_post' => 'success',
-                    ]);
-                } else {
-                    DB::table('class')->where('id', '=', $class->id)->update([
-                        'add_post' => $post_result,
-                    ]);
+                if ($class->week_of_day == null) {
+                    echo "Error\n";
+                    return 0;
                 }
+                $day = strtoupper($class->week_of_day);
+
+                if (!isset($this->week_of_day[$day])) {
+                    echo "Error2\n";
+                    return 0;
+                }
+
+                $days_of_week = $this->week_of_day[$day];
+                $data = [
+
+                    "subject" => $class->calendar_subject,
+                    "body" => [
+                        "contentType" => "html",
+                        "content" => $class->study_type . " : " . $class->week_of_day . " : " . $text_time,
+                    ],
+                    "start" => [
+                        "dateTime" => $start_date_time,
+                        "timeZone" => "Asia/Bangkok",
+                    ],
+                    "end" => [
+                        "dateTime" => $end_date_time,
+                        "timeZone" => "Asia/Bangkok",
+                    ],
+                    "location" => [
+                        "displayName" => $class->room_name,
+                    ],
+                    "attendees" => [
+                        [
+                            "emailAddress" => [
+                                "address" => $group_mail,
+                                "name" => "GROUP MAIL",
+                            ],
+                            "type" => "required",
+                        ],
+                    ],
+                    "isOnlineMeeting" => true,
+                    "onlineMeetingProvider" => "teamsForBusiness",
+                    "recurrence" => [
+                        "pattern" => [
+                            "type" => "weekly",
+                            "interval" => 1,
+                            "daysOfWeek" => [
+                                $days_of_week,
+                            ],
+                        ],
+                        "range" => [
+                            "type" => "endDate",
+                            "startDate" => $start_date,
+                            "endDate" => $end_date,
+                        ],
+                    ],
+                ];
+
+                //OWNER ACCESS TOKEN
+                // $token = env('TOKEN');
+                $token = $this->nun();
+                if ($token === false) {
+                    return 0;
+                }
+
+                $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/calendar/events";
+
+                $response = Http::withToken($token)->post($endpoint, $data);
+                $response_data = $response->json();
+
+                if (isset($response_data['error'])) {
+                    DB::table('class')->where('class_id', '=', $class_id)->update([
+                        'add_event' => $response_data['error'],
+                    ]);
+                    echo $response_data['error'] . "\n";
+                    //Delete All Job
+                    DB::table('jobs')->truncate();
+                } else {
+                    echo "Add Success : " . $class->class_id . "\n";
+                    //Create Success
+                    $event_id = $response['id'];
+                    $body_content = $response['body'];
+                    DB::table('class')->where('id', '=', $class->id)->update([
+                        'event_id' => $event_id,
+                        'event_body' => json_encode($body_content),
+                        'add_event' => 'success',
+                    ]);
+                    $post_result = $this->postMeetingToTeam($team_id, $channel_id, $body_content, $team_name);
+                    if ($post_result === true) {
+                        DB::table('class')->where('id', '=', $class->id)->update([
+                            'add_post' => 'success',
+                        ]);
+                    } else {
+                        DB::table('class')->where('id', '=', $class->id)->update([
+                            'add_post' => $post_result,
+                        ]);
+                    }
+                }
+            } catch (Exception $e) {
+                DB::table('class')->where('class_id', '=', $class_id)->update([
+                    'add_event' => $e->getMessage(),
+                ]);
+                Log::error("error", [
+                    'message' => $e->getMessage(),
+                    'class_id' => $class_id,
+                ]);
             }
         }
     }
@@ -365,7 +392,7 @@ class MsController extends Controller
 
     public function postMeetingToTeam($team_id, $channel_id, $body_content, $team_name)
     {
-        $access_token = env('TOKEN');
+        $access_token = $this->nun();
         $end_point = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/channels/" . $channel_id . "/messages";
         $data = [
             "subject" => $team_name,
@@ -419,9 +446,11 @@ class MsController extends Controller
             ->whereNotNull('team_id')
             ->whereNull('add_event')
             ->groupBy('class_id')
+            ->limit(100)
             ->get();
+        // dd($all_class);
         foreach ($all_class as $class) {
-            dispatch(new CreateEventJob($class->class_id));
+            \dispatch(new CreateEventJob($class->class_id));
         }
     }
 
@@ -642,7 +671,29 @@ class MsController extends Controller
     {
         $all_class = DB::table('class')->whereNull('group_mail')->groupBy('class_id')->get();
         foreach ($all_class as $class) {
-            dispatch(new GetGroupMailAndChannelIdJob($class->class_id,$class->team_id));
+            dispatch(new GetGroupMailAndChannelIdJob($class->class_id, $class->team_id));
         }
     }
+
+    public function nun()
+    {
+        $url = "https://login.microsoftonline.com/" . env('TENANT_ID') . "/oauth2/v2.0/token";
+        $response = Http::asForm()->post($url, [
+
+            'grant_type' => 'password',
+            'client_id' => env('CLIENT_ID'),
+            'client_secret' => env('CLIENT_SECRET'),
+            'scope' => 'https://graph.microsoft.com/.default',
+            'username' => env('MAIL'),
+            'password' => env('MAIL_PASS'),
+        ]);
+
+        if ($response->successful()) {
+            $token = $response->json()['access_token'];
+            return $token;
+        } else {
+            return false;
+        }
+    }
+
 }
