@@ -194,4 +194,5 @@ class MainController extends Controller
 
         return redirect('/class/detail/' . $class_id);
     }
+
 }

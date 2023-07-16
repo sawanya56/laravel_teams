@@ -49,7 +49,7 @@
                     </div>
                     <div class="row">
                         <div class="col-3" href="">
-                            <button type="botton" class="btn btn-primary">Back</button>
+                            <button type="button" class="btn btn-primary" href="/main">Back</button>
                         </div>
                         <div class="col-3"></div>
                         <div class="col-3"></div>

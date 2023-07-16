@@ -456,6 +456,7 @@ class MsController extends Controller
 
     public function processQueueAddStudent()
     {
+        // dispatch(new AddStudentJob(337152, '221d70ec-bea1-485b-91b6-7f6c7d07f0da'));
         $all_class = DB::table('view_students')->get();
         foreach ($all_class as $class) {
             $class_id = $class->class_id;
@@ -496,6 +497,7 @@ class MsController extends Controller
     public function deleteAllEvent($team_id)
     {
         $events = DB::table('class')->whereNotNull('event_id')->get();
+        dd($events);
         foreach ($events as $event) {
 
             $token = env('TOKEN');
@@ -696,4 +698,24 @@ class MsController extends Controller
         }
     }
 
+    public function RemoveEvent($class_id)
+    {
+        $events = DB::table('class')->where('class_id', '=', $class_id)->get();
+        dd($events);
+        foreach ($events as $event) {
+
+            $token = env('TOKEN');
+            $endpoint = "https://graph.microsoft.com/v1.0/me/events/". $event->event_id;
+            
+            $response = Http::withToken($token)->delete($endpoint);
+            $json = $response->json();
+
+            if (isset($json['error'])) {
+                echo $event->event_id . "<br><br>";
+            } else {
+                dd($json);
+            }
+        }
+       
+    }
 }
