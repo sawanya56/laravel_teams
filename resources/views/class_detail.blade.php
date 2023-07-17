@@ -4,7 +4,7 @@
     <div class="container-fluid mt-2">
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card">
+                <div class="card border-0">
                     <div class="card-body">
                         <h5>{{ $class_detail->team_name }}</h5>
                         <h5>{{ $class_detail->calendar_subject }}</h5>
@@ -19,13 +19,13 @@
                         <div class="row">
                             <div class="col-3">
                                 <a href="/main">
-                                    <button class="btn btn-primary">BACK</button>
+                                    <button class="styled-button">BACK</button>
                                 </a>
                             </div>
                             <div class="col-3"></div>
-                            <div class="col-3"></div>
-                            <div class="col-3">
-                                <button class="btn btn-danger" id="btnDelete">DELETE TEAM WITH DATABASE</button>
+                            <div class="col-2"></div>
+                            <div class="col-4">
+                                <button class="styled-button-remove" id="btnDelete">DELETE TEAM WITH DATABASE</button>
                                 <form action="/team/delete/all" method="post" id="formDelete">
                                     <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
                                     <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
@@ -37,7 +37,8 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+
+        <div class="row mt-2">
             <div class="col-12">
                 @if (Session::has('message'))
                     <div class="{{ Session::get('alert') }}" role="alert">
@@ -46,12 +47,13 @@
                 @endif
             </div>
         </div>
+
         {{-- INSTRUCTOR --}}
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card">
+                <div class="card border-0">
                     <div class="card-body">
-                        <h4><b>Instructor</b></h4>
+                        <h4 style="color:#D14D72"><b>Instructor</b></h4>
                         <form method="post" action="/class/add/owner">
                             @csrf
                             <div class="row">
@@ -63,7 +65,7 @@
                                     <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
                                 </div>
                                 <div class="form-group col-md-2">
-                                    <button type="submit" class="btn btn-primary">Add Instructor</button>
+                                    <button type="submit" class="styled-button" >Add Instructor</button>
                                 </div>
                             </div>
                         </form>
@@ -73,10 +75,10 @@
                         <table class="table" id="example">
                             <thead>
                                 <tr>
-                                    <th style="color:#0d68d7">No</th>
-                                    <th style="color:#0d68d7">Mail</th>
-                                    <th style="color:#0d68d7">Add Success</th>
-                                    <th style="color:#0d68d7">Button</th>
+                                    <th style="color:#89375F">No</th>
+                                    <th style="color:#89375F">Mail</th>
+                                    <th style="color:#89375F">Add Success</th>
+                                    <th style="color:#89375F">Button</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -98,10 +100,10 @@
         {{-- STUDENT --}}
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card">
+                <div class="card border-0">
                     <div class="card-body">
-                        <h4><b>Student</b></h4>
-                        <form method="post" action="/class/add/student">
+                        <h4 style="color:#D14D72"><b>Student</b></h4>
+                        <form method="post" action="/class/add/student" class="pagination-info">
                             @csrf
                             <div class="row">
                                 <div class="form-group col-md-10">
@@ -112,19 +114,19 @@
                                 </div>
 
                                 <div class="form-group col-md-2">
-                                    <button type="submit" class="btn btn-primary">Add Student</button>
+                                    <button type="submit" class="styled-button" >Add Student</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                     <div class="card-body">
-                        <table class="table" id="example2"  style="color:#ff0000">
+                        <table class="table" id="example2" >
                             <thead>
                                 <tr>
-                                    <th style="color:#0d68d7">No</th>
-                                    <th style="color:#0d68d7">Mail</th>
-                                    <th style="color:#0d68d7">Add_success</th>
-                                    <th style="color:#0d68d7">Button</th>
+                                    <th style="color:#89375F">No</th>
+                                    <th style="color:#89375F">Mail</th>
+                                    <th style="color:#89375F">Add_success</th>
+                                    <th style="color:#89375F">Button</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -140,7 +142,7 @@
                                                 <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
                                                 <input type="hidden" name="class_id" value="{{ $row->class_id }}">
                                                 <input type="hidden" name="email" value="{{ $row->student_mail }}">
-                                                <button type="submit" class="btn btn-danger">Remove</button>
+                                                <button type="submit" class="styled-button-remove">Remove</button>
                                             </form>
                                         </td>
                                     </tr>

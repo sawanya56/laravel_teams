@@ -8,9 +8,9 @@
                     <table class="table" id="example">
                         <thead>
                             <tr>
-                                <td style="color:#0d68d7"><b>Class_id</b></td>
-                                <td style="color:#0d68d7"><b>Name<b></td>
-                                <td style="color:#0d68d7"><b>Action<b></i></td>
+                                <td style="color:#89375F"><b>Class_id</b></td>
+                                <td style="color:#89375F"><b>Name<b></td>
+                                <td style="color:#89375F"><b>Action<b></i></td>
 
                             </tr>
                         </thead>
@@ -21,7 +21,7 @@
                                     <td>{{ $row->team_name }}</td>
                                     <td>
                                         <a href="/class/detail/{{ $row->class_id }}"><button
-                                                class="btn btn-outline-primary">ดูรายละเอียด</button></a>
+                                                class="styled-button">ดูรายละเอียด</button></a>
                                     </td>
                                 </tr>
                             @endforeach
