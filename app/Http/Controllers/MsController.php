@@ -111,7 +111,7 @@ class MsController extends Controller
         }
     }
 
-    public function AddStudent($class_id, $team_id)
+    public function AddStudent($class_id = '336852', $team_id = 'e46b9c98-605a-44cb-80cc-1ad673c57718')
     {
 
         $students = DB::table('enrollments')->where('class_id', '=', $class_id)->whereNull('add_success')->get();

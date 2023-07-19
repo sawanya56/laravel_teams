@@ -4,13 +4,13 @@
     <div class="container-fluid mt-2">
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card border-0">
+                <div class="card border-0" style=" box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                     <div class="card-body">
-                        <h5>{{ $class_detail->team_name }}</h5>
+                        <h5 style="color:#89375F; font-size: 25px" >{{ $class_detail->team_name }}</h5>
                         <h5>{{ $class_detail->calendar_subject }}</h5>
                         <h5>Team ID : {{ $class_detail->team_id }}</h5>
                         <h5>Channel ID : {{ $class_detail->channel_id }}</h5>
-                        <h5>CLASS ID : {{ $class_detail->class_id }}</h5>
+                        <h5 >CLASS ID : {{ $class_detail->class_id }}</h5>
 
                         @foreach ($schedules as $item)
                             <h5> day :{{ $item->week_of_day }} {{ $item->start_time }}</h5>
@@ -51,7 +51,7 @@
         {{-- INSTRUCTOR --}}
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card border-0">
+                <div class="card border-0" style=" box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                     <div class="card-body">
                         <h4 style="color:#D14D72"><b>Instructor</b></h4>
                         <form method="post" action="/class/add/owner">
@@ -65,7 +65,7 @@
                                     <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
                                 </div>
                                 <div class="form-group col-md-2">
-                                    <button type="submit" class="styled-button" >Add Instructor</button>
+                                    <button type="submit" class="styled-button">Add Instructor</button>
                                 </div>
                             </div>
                         </form>
@@ -100,7 +100,7 @@
         {{-- STUDENT --}}
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card border-0">
+                <div class="card border-0" style=" box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                     <div class="card-body">
                         <h4 style="color:#D14D72"><b>Student</b></h4>
                         <form method="post" action="/class/add/student" class="pagination-info">
@@ -114,13 +114,13 @@
                                 </div>
 
                                 <div class="form-group col-md-2">
-                                    <button type="submit" class="styled-button" >Add Student</button>
+                                    <button type="submit" class="styled-button">Add Student</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                     <div class="card-body">
-                        <table class="table" id="example2" >
+                        <table class="table" id="example2">
                             <thead>
                                 <tr>
                                     <th style="color:#89375F">No</th>
@@ -139,7 +139,8 @@
                                             <form action="/class/remove/student" method="post"
                                                 onsubmit="return confirm('ลบไหม?');">
                                                 @csrf
-                                                <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
+                                                <input type="hidden" name="team_id"
+                                                    value="{{ $class_detail->team_id }}">
                                                 <input type="hidden" name="class_id" value="{{ $row->class_id }}">
                                                 <input type="hidden" name="email" value="{{ $row->student_mail }}">
                                                 <button type="submit" class="styled-button-remove">Remove</button>

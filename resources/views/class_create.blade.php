@@ -3,7 +3,7 @@
 @section('container')
     <div class="row mt-4">
         <div class="col-12">
-            <div class="card-content">
+            <div class="card border-0" style=" box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card card-body">
                     <form method="post" action="/class/create">
                         @csrf
@@ -49,9 +49,10 @@
 
                         </div>
                         <div class="row">
-                            <div class="col-3" href="">
-                                <button type="button" class="btn btn" style="background-color:#7367f0;color:white"
-                                    href="/main">Back</button>
+                            <div class="col-3">
+                                <a href="/main">
+                                    <button type="button" class="styled-button">Back</button>
+                                </a>
                             </div>
                             <div class="col-3"></div>
                             <div class="col-3"></div>
