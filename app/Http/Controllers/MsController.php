@@ -111,7 +111,7 @@ class MsController extends Controller
         }
     }
 
-    public function AddStudent($class_id = '336852', $team_id = 'e46b9c98-605a-44cb-80cc-1ad673c57718')
+    public function AddStudent($class_id = '338747', $team_id = '66bdfc53-a130-4870-83a3-1bd82d04b5dc')
     {
 
         $students = DB::table('enrollments')->where('class_id', '=', $class_id)->whereNull('add_success')->get();
@@ -182,10 +182,10 @@ class MsController extends Controller
         }
     }
 
-    public function getGroupmail($team_id, $class_id, $access_token)
+    public function getGroupmail($team_id , $class_id , $access_token)
     {
         // $access_token = $this->getAccessTokenDatabase();
-        $endpoint = "https://graph.microsoft.com/v1.0/groups/ " . $team_id;
+        $endpoint = "https://graph.microsoft.com/v1.0/groups/" . $team_id;
         $endpoint = str_replace(" ", "", $endpoint);
         $response = Http::withToken($access_token)->get($endpoint);
         if ($response->successful()) {

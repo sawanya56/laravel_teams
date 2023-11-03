@@ -19,11 +19,12 @@ class AddDropController extends Controller
 
             $class_id = $class->class_id;
             $class_detail = DB::table('class')->where('class_id', '=', $class_id)->first();
-
+            // DB::table('add')->update([ 'add_success' => 'success']);
             if ($class_detail != null) {
                 $team_id = $class_detail->team_id;
                 if ($team_id != null) {
                     dispatch(new AddStudentJob($class_id, $team_id));
+                    
                 }
             } else {
                 // echo "Team id not found :" . $class_id . "<br>";

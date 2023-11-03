@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Models\MjuClass as ModelsMjuClass;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,9 +14,18 @@ class MjuClass extends Model
 
     public function updateMsTeamId($class_id, $team_id)
     {
-        $model = MjuClass::where('class_id', '=', $class_id)->update([
-            'team_id' => $team_id,
-        ]);
+        try {
+            MjuClass::where('class_id', '=', $class_id)->update([
+                'team_id' => $team_id,
+            ]);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function getAllClass(){
+        MjuClass::whereNull('team_id')->get();
     }
 
     public function getClassStudentNull()
