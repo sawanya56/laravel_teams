@@ -3,6 +3,7 @@
 use App\Http\Controllers\AddDropController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MsController;
+use App\Http\Controllers\QueueController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,7 +21,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test', [MsController::class, 'CreateEvent']);
+// Route::get('test', [MsController::class, 'CreateEvent']);
 
 Route::get('team/token', [MsController::class, 'getAccessTokenDatabase']);
 
@@ -52,5 +53,8 @@ Route::post('/class/remove/student', [MainController::class, 'postRemoveStudent'
 
 Route::get('/adddrop/add', [AddDropController::class, 'addStudent']);
 Route::get('/adddrop/drop', [AddDropController::class, 'dropStudent']);
+
+
+Route::get('test', [QueueController::class, 'processQueueCreateTeam'])->name("nun");
 
 Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);

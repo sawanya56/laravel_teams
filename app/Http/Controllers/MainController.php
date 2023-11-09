@@ -195,4 +195,23 @@ class MainController extends Controller
         return redirect('/class/detail/' . $class_id);
     }
 
+    public function createTeam(Request $request){
+        $name = $request->name;
+        $name = $request->name;
+        $name = $request->name;
+
+        $model = new TeamController();
+        $model->createTeams($name,$name,$name);
+
+        return redirect()->route('nun');
+        return redirect()->back();
+        return redirect('test');
+        //กลับหน้า from
+    }
+
+    public function getCreateTeam(){
+        return view('');
+        //หน้าfrom
+    }
+
 }
