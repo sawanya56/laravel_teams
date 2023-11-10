@@ -196,16 +196,16 @@ class MainController extends Controller
     }
 
     public function createTeam(Request $request){
-        $name = $request->name;
-        $name = $request->name;
-        $name = $request->name;
+        $team_name = $request->team_name;
+        $class_id = $request->class_id;
+        $description = $request->description;
 
         $model = new TeamController();
-        $model->createTeams($name,$name,$name);
+        $model->createTeams($team_name,$class_id,$description);
 
         return redirect()->route('nun');
-        return redirect()->back();
-        return redirect('test');
+        // return redirect()->back();
+        // return redirect('test');
         //กลับหน้า from
     }
 
