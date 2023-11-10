@@ -1,17 +1,16 @@
-@extends('layout')
+@extends('app')
 
 @section('container')
     <div class="row mt-4">
         <div class="col-12">
             <div class="card border-0" style=" box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
-                    <table class="table" id="example">
+                    <table class="table" id="dataTable">
                         <thead>
                             <tr>
-                                <td style="color:#89375F"><b>Class_id</b></td>
-                                <td style="color:#89375F"><b>Name<b></td>
-                                <td style="color:#89375F"><b>Action<b></i></td>
-
+                                <td style="color:#1b25bb"><b>Class_id</b></td>
+                                <td style="color:#1b25bb"><b>Name<b></td>
+                                <td style="color:#1b25bb"><b>Action<b></i></td>
                             </tr>
                         </thead>
                         <tbody>
@@ -21,7 +20,7 @@
                                     <td>{{ $row->team_name }}</td>
                                     <td>
                                         <a href="/class/detail/{{ $row->class_id }}"><button
-                                                class="styled-button">ดูรายละเอียด</button></a>
+                                                class="btn btn-primary" id="sidebarToggleTop">ดูรายละเอียด</button></a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -32,7 +31,7 @@
         </div>
     </div>
 
-    <div class="row mt-4">
+    {{-- <div class="row mt-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
@@ -47,9 +46,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
-    <script>
+    {{-- <script>
         document.getElementById('btn_search').addEventListener('click', function() {
 
             // let class_id = document.getElementById('class_id').value;
@@ -86,5 +85,5 @@
                 }
             };
         }
-    </script>
+    </script> --}}
 @endsection

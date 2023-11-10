@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('app')
 
 @section('container')
     <div class="container-fluid mt-2">
@@ -6,7 +6,7 @@
             <div class="col-12">
                 <div class="card border-0" style=" box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                     <div class="card-body">
-                        <h5 style="color:#89375F; font-size: 25px" >{{ $class_detail->team_name }}</h5>
+                        <h5 style="color:rgb(2, 0, 138); font-size: 25px" ><b>{{ $class_detail->team_name }}</b></h5>
                         <h5>{{ $class_detail->calendar_subject }}</h5>
                         <h5>Team ID : {{ $class_detail->team_id }}</h5>
                         <h5>Channel ID : {{ $class_detail->channel_id }}</h5>
@@ -19,13 +19,13 @@
                         <div class="row">
                             <div class="col-3">
                                 <a href="/main">
-                                    <button class="styled-button">BACK</button>
+                                    <button class="btn btn-primary">BACK</button>
                                 </a>
                             </div>
                             <div class="col-3"></div>
                             <div class="col-2"></div>
                             <div class="col-4">
-                                <button class="styled-button-remove" id="btnDelete">DELETE TEAM WITH DATABASE</button>
+                                <button class="btn btn-danger" id="btnDelete">DELETE TEAM WITH DATABASE</button>
                                 <form action="/team/delete/all" method="post" id="formDelete">
                                     <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
                                     <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
@@ -53,7 +53,7 @@
             <div class="col-12">
                 <div class="card border-0" style=" box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                     <div class="card-body">
-                        <h4 style="color:#D14D72"><b>Instructor</b></h4>
+                        <h4 style="color:rgb(2, 0, 138)"><b>Instructor</b></h4>
                         <form method="post" action="/class/add/owner">
                             @csrf
                             <div class="row">
@@ -65,7 +65,7 @@
                                     <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
                                 </div>
                                 <div class="form-group col-md-2">
-                                    <button type="submit" class="styled-button">Add Instructor</button>
+                                    <button type="submit" class="btn btn-primary">Add Instructor</button>
                                 </div>
                             </div>
                         </form>
@@ -75,10 +75,10 @@
                         <table class="table" id="example">
                             <thead>
                                 <tr>
-                                    <th style="color:#89375F">No</th>
-                                    <th style="color:#89375F">Mail</th>
-                                    <th style="color:#89375F">Add Success</th>
-                                    <th style="color:#89375F">Button</th>
+                                    <th style="color:#1b25bb">No</th>
+                                    <th style="color:#1b25bb">Mail</th>
+                                    <th style="color:#1b25bb">Add Success</th>
+                                    <th style="color:#1b25bb">Button</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -102,7 +102,7 @@
             <div class="col-12">
                 <div class="card border-0" style=" box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                     <div class="card-body">
-                        <h4 style="color:#D14D72"><b>Student</b></h4>
+                        <h4 style="color:rgb(2, 0, 138)"><b>Student</b></h4>
                         <form method="post" action="/class/add/student" class="pagination-info">
                             @csrf
                             <div class="row">
@@ -114,7 +114,7 @@
                                 </div>
 
                                 <div class="form-group col-md-2">
-                                    <button type="submit" class="styled-button">Add Student</button>
+                                    <button type="submit" class="btn btn-primary">Add Student</button>
                                 </div>
                             </div>
                         </form>
@@ -123,10 +123,10 @@
                         <table class="table" id="example2">
                             <thead>
                                 <tr>
-                                    <th style="color:#89375F">No</th>
-                                    <th style="color:#89375F">Mail</th>
-                                    <th style="color:#89375F">Add_success</th>
-                                    <th style="color:#89375F">Button</th>
+                                    <th style="color:#1b25bb">No</th>
+                                    <th style="color:#1b25bb">Mail</th>
+                                    <th style="color:#1b25bb">Add_success</th>
+                                    <th style="color:#1b25bb">Button</th>
                                 </tr>
                             </thead>
                             <tbody>

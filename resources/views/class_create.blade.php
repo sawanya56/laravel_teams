@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('app')
 
 @section('container')
     <div class="row mt-4">
@@ -51,7 +51,7 @@
                         <div class="row">
                             <div class="col-3">
                                 <a href="/main">
-                                    <button type="button" class="styled-button">Back</button>
+                                    <button type="button" class="btn btn-primary">Back</button>
                                 </a>
                             </div>
                             <div class="col-3"></div>

@@ -39,14 +39,14 @@ Route::get('/', function () {
 // Route::get('team/event/delete', [MsController::class, 'deleteAllEvent']);
 // Route::get('team/event/create', [MsController::class, 'porcessQueueCreateEvent']);
 
-// Route::get('/main', [MainController::class, 'main']);
-// Route::get('/class/detail/{id}', [MainController::class, 'getClassDetail']);
+Route::get('/main', [MainController::class, 'main'])->name('main');
+Route::get('/class/detail/{id}', [MainController::class, 'getClassDetail']);
 
 // Route::post('/class/add/owner', [MainController::class, 'addOwner']);
 // Route::post('/team/delete/all', [MainController::class, 'deleteTeam']);
 
-// Route::get('/class/create', [MainController::class, 'getClassCreate']);
-// Route::post('/class/create', [MainController::class, 'postClassCreate']);
+Route::get('/class/create', [MainController::class, 'getClassCreate'])->name('class/create');
+Route::post('/class/create', [MainController::class, 'postClassCreate']);
 // Route::post('/class/add/student', [MainController::class, 'postAddStudent']);
 // Route::post('/class/remove/student', [MainController::class, 'postRemoveStudent']);
 
@@ -65,3 +65,13 @@ Route::prefix('team')->controller(MainController::class)->group(function(){
 Route::get('test', [QueueController::class, 'processQueueCreateTeam'])->name("nun");
 
 Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
+
+
+
+
+Route::get('/app', function () {
+    return view('app');
+});
+Route::get('/menu', function () {
+    return view('menu');
+});
