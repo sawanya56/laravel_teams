@@ -4,6 +4,7 @@ use App\Http\Controllers\AddDropController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MsController;
 use App\Http\Controllers\QueueController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,14 +19,22 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('app');
 });
 
+
+
+Route::get('team/create/room', [TeamController::class, 'createTeams']);
+Route::get('team/instructor/add', [TeamController::class, 'addInstructor']);
+Route::get('team/student/add', [TeamController::class, 'addStudent']);
+Route::get('team/student/remove', [TeamController::class, 'removeStudent']);
+Route::get('team/event/create', [TeamController::class, 'createEvent']);
 // Route::get('test', [MsController::class, 'CreateEvent']);
 
 // Route::get('team/token', [MsController::class, 'getAccessTokenDatabase']);
 
 // Route::get('team/create', [MsController::class, 'processQueueCreateTeam']);
+
 // Route::get('team/student/add', [MsController::class, 'processQueueAddStudent']);
 // Route::get('team/instructor/add', [MsController::class, 'processQueueAddInstructor']);
 // Route::get('team/event/create', [MsController::class, 'porcessQueueCreateEvent']);

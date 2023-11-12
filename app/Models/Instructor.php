@@ -25,7 +25,7 @@ class Instructor extends Model
 
         if ($ins == null) {
             $class = MjuClass::where('class_id', '=', $class_id)->first();
-            $ins = Instructor::insert([
+            $model_insert = Instructor::insertGetId([
                 'year' => $class->year,
                 'term' => $class->term,
                 'course_code' => $class->course_code,
@@ -34,6 +34,7 @@ class Instructor extends Model
                 'email' => $email,
                 'add_by' => "nun",
             ]);
+            $ins = Instructor::find($model_insert);
             return $ins;
         } else {
             return $ins;

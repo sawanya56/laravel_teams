@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Enrollment;
 use App\Models\Instructor;
+use App\Models\MjuClass;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
-use App\Models\MjuClass;
 
 class TeamController extends Controller
 {
@@ -26,11 +25,11 @@ class TeamController extends Controller
 
     ];
 
-
-    public function createTeams($team_name, $class_id, $description)
+    public function createTeams($team_name = 'Sert&Nune', $class_id = '65507988ad0a7', $description = 'มะน่อมะแน่งมั๊บ')
     {
         $access_token = parent::getAccessToken();
         $owner_email = 'sawanya_kck@mju.ac.th';
+
         try {
             $response = Http::withToken($access_token)->post('https://graph.microsoft.com/v1.0/teams', [
                 "template@odata.bind" => "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
@@ -58,7 +57,7 @@ class TeamController extends Controller
         }
     }
 
-    public function addInstructor($class_id, $team_id, $instructor_mail)
+    public function addInstructor($class_id = '65507988ad0a7', $team_id = '8193fd40-1416-47b3-a207-ec19d5be0262', $instructor_mail = 'prasert_kb@mju.ac.th')
     {
         $access_token = parent::getAccessToken();
         $instructor_mail = strtolower($instructor_mail);
@@ -81,12 +80,11 @@ class TeamController extends Controller
             $status = $message['error']['message'];
             $success = false;
         }
-
         $model->updateInstructorStatus($ins->id, $status);
         return $success;
     }
 
-    public function addStudent($class_id, $team_id, $student_id)
+    public function addStudent($class_id = '65507988ad0a7', $team_id = '8193fd40-1416-47b3-a207-ec19d5be0262', $student_id = '6204101356')
     {
         $model = new Enrollment();
 
@@ -118,10 +116,10 @@ class TeamController extends Controller
         return $success;
     }
 
-    public function removeStudent($team_id, $student_mail, $class_id)
+    public function removeStudent($team_id='8193fd40-1416-47b3-a207-ec19d5be0262', $student_id = '6204101356', $class_id= '65507988ad0a7')
     {
         $token = parent::getAccessToken();
-
+        $student_mail = 'MJU'. $student_id .'@mju.ac.th';
         $getMembersUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members";
         $response = Http::withToken($token)->get($getMembersUrl);
         $members = $response->json()['value'] ?? [];
@@ -150,7 +148,7 @@ class TeamController extends Controller
         return false;
     }
 
-    public function createEvent($class_id)
+    public function createEvent($class_id = '65507988ad0a7')
     {
         $all_class = DB::table('class')->where('class_id', '=', $class_id)->get();
         foreach ($all_class as $class) {
@@ -161,11 +159,11 @@ class TeamController extends Controller
                 $team_name = $class->team_name;
                 $group_mail = $class->group_mail;
                 $channel_id = $class->channel_id;
-                $group_mail = $this->getGroupmail($team_id, $class_id,$access_token);
-                $channel_id = $this->getChannel($team_id, $class_id,$access_token);
+                $group_mail = $this->getGroupmail($team_id, $class_id, $access_token);
+                $channel_id = $this->getChannel($team_id, $class_id, $access_token);
 
-                $start_date = '2023-07-03';
-                $end_date = '2023-11-06';
+                $start_date = '2023-11-01';
+                $end_date = '2023-11-30';
 
                 // $days_of_week = [];
                 $start_time = $class->start_time;
@@ -346,5 +344,22 @@ class TeamController extends Controller
             ]);
             return false;
         }
+    }
+
+    public function calculateEndTime($start_time, $dulation_time)
+    {
+        $start_time = new DateTime($start_time);
+        $incress_time = "+ " . $dulation_time . " minutes";
+
+        $end_time = date('Y-m-d H:i', strtotime($incress_time, strtotime($start_time->format('H:i'))));
+        $end_time = new DateTime($end_time);
+
+        $new_start_time = $start_time->format('H:i');
+        $new_end_time = $end_time->format('H:i');
+
+        return [
+            'start_time' => $new_start_time,
+            'end_time' => $new_end_time,
+        ];
     }
 }

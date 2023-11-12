@@ -112,7 +112,7 @@ class MainController extends Controller
                 'class_id' => $class_id,
                 'section' => $enroll->section,
                 'student_mail' => $student_mail,
-                'add_success' => 'success'
+                'add_success' => 'success',
             ]);
             $request->session()->flash('message', 'Add Student Success');
             $request->session()->flash('alert', 'alert alert-success');
@@ -145,11 +145,29 @@ class MainController extends Controller
 
     public function postClasscreate(Request $request)
     {
+        $team_name = $request->team_name;
+        $course_code = $request->course_code;
+        $section = $request->section;
+        $week_of_day = $request->week_of_day;
+        $start_time = $request->start_time;
+        $end_time = $request->end_time;
+        $duration_time = $request->duration_time;
 
         $model = new ClassModel();
-        $model->insert($request);
+        $result = $model->insertClass($team_name, $course_code, $section, $week_of_day, $start_time, $end_time, $duration_time);
         // dd($request->all());
-        return redirect('class/create');
+
+        if ($result == true) {
+            return response()->json([
+                'status' => 'success',
+                
+            ]);
+        }else{
+            return response()->json([
+                'status'=> 'fail'
+                ]);
+        }
+        // return redirect('class/create');
     }
 
     public function postRemoveStudent(Request $request)
@@ -182,7 +200,7 @@ class MainController extends Controller
                     $request->session()->flash('alert', 'alert alert-success');
                 } else {
                     $message = $response->json();
-                    dd($message,$removeMemberUrl,$memberId);
+                    dd($message, $removeMemberUrl, $memberId);
                     $request->session()->flash('message', 'Add Student Fail :' . $message['error']['message']);
                     $request->session()->flash('alert', 'alert alert-danger');
                     //Fail
@@ -195,13 +213,14 @@ class MainController extends Controller
         return redirect('/class/detail/' . $class_id);
     }
 
-    public function createTeam(Request $request){
+    public function createTeam(Request $request)
+    {
         $team_name = $request->team_name;
         $class_id = $request->class_id;
         $description = $request->description;
 
         $model = new TeamController();
-        $model->createTeams($team_name,$class_id,$description);
+        $model->createTeams($team_name, $class_id, $description);
 
         return redirect()->route('nun');
         // return redirect()->back();
@@ -209,7 +228,8 @@ class MainController extends Controller
         //กลับหน้า from
     }
 
-    public function getCreateTeam(){
+    public function getCreateTeam()
+    {
         return view('');
         //หน้าfrom
     }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\MainController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,3 +24,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request)
 
 Route::get('');
 Route::get('/get/student/class',[StudentController::class, 'getStudentByClassId']);
+Route::post('/class/create', [MainController::class, 'postClassCreate']);

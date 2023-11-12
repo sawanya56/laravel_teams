@@ -638,6 +638,7 @@ class MsController extends Controller
             ]);
             return 0;
         }
+        
         $team_id = $class->team_id;
         $getMembersUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members";
         $response = Http::withToken($token)->get($getMembersUrl);
