@@ -29,6 +29,7 @@ Route::get('team/instructor/add', [TeamController::class, 'addInstructor']);
 Route::get('team/student/add', [TeamController::class, 'addStudent']);
 Route::get('team/student/remove', [TeamController::class, 'removeStudent']);
 Route::get('team/event/create', [TeamController::class, 'createEvent']);
+Route::get('team/post/massage', [TeamController::class, 'postMeetingToTeam']);
 // Route::get('test', [MsController::class, 'CreateEvent']);
 
 // Route::get('team/token', [MsController::class, 'getAccessTokenDatabase']);

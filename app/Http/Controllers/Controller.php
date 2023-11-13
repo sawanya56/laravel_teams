@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class Controller extends BaseController
 {
@@ -45,5 +46,26 @@ class Controller extends BaseController
         ]);
 
         return $tokenData['access_token'];
+    }
+
+    public function getAccessTokenOwner()
+    {
+        $url = "https://login.microsoftonline.com/" . env('TENANT_ID') . "/oauth2/v2.0/token";
+        $response = Http::asForm()->post($url, [
+
+            'grant_type' => 'password',
+            'client_id' => env('CLIENT_ID'),
+            'client_secret' => env('CLIENT_SECRET'),
+            'scope' => 'https://graph.microsoft.com/.default',
+            'username' => env('MAIL'),
+            'password' => env('MAIL_PASS'),
+        ]);
+
+        if ($response->successful()) {
+            $token = $response->json()['access_token'];
+            return $token;
+        } else {
+            return false;
+        }
     }
 }

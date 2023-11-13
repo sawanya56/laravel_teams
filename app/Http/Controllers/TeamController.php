@@ -187,7 +187,6 @@ class TeamController extends Controller
 
                 $days_of_week = $this->week_of_day[$day];
                 $data = [
-
                     "subject" => $class->calendar_subject,
                     "body" => [
                         "contentType" => "html",
@@ -230,8 +229,9 @@ class TeamController extends Controller
                         ],
                     ],
                 ];
-
-                $token = parent::getAccessToken();
+                
+                // $token = parent::getAccessToken();
+                $token = parent::getAccessTokenOwner();
                 if ($token === false) {
                     return false;
                 }
@@ -240,12 +240,13 @@ class TeamController extends Controller
 
                 $response = Http::withToken($token)->post($endpoint, $data);
                 $response_data = $response->json();
-
-                if (isset($response_data['error'])) {
+                $response_result = $response->successful();
+                
+                if ( $response_result == false) {
                     MjuClass::where('class_id', '=', $class_id)->update([
-                        'add_event' => $response_data['error'],
+                        'add_event' => json_encode($response_data),
                     ]);
-                    echo $response_data['error'] . "\n";
+                    // echo $response_data['error'] . "\n";
                     //Delete All Job
                     DB::table('jobs')->truncate();
                 } else {
@@ -253,11 +254,12 @@ class TeamController extends Controller
                     //Create Success
                     $event_id = $response['id'];
                     $body_content = $response['body'];
+                    // dd($body_content);
                     MjuClass::where('id', '=', $class->id)->update([
                         'event_id' => $event_id,
                         'event_body' => json_encode($body_content),
-                        'add_event' => 'success',
-                    ]);
+                        'add_event' => 'success', 
+                     ]);
                     $post_result = $this->postMeetingToTeam($team_id, $channel_id, $body_content, $team_name);
                     if ($post_result === true) {
                         MjuClass::where('id', '=', $class->id)->update([
@@ -269,6 +271,7 @@ class TeamController extends Controller
                         ]);
                     }
                 }
+              
             } catch (Exception $e) {
                 DB::table('class')->where('class_id', '=', $class_id)->update([
                     'add_event' => $e->getMessage(),
@@ -283,7 +286,7 @@ class TeamController extends Controller
 
     public function postMeetingToTeam($team_id, $channel_id, $body_content, $team_name)
     {
-        $access_token = parent::getAccessToken();
+        $access_token = parent::getAccessTokenOwner();
         $end_point = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/channels/" . $channel_id . "/messages";
         $data = [
             "subject" => $team_name,
