@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Http\Controllers\MsController;
+
 use App\Http\Controllers\TeamController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -33,7 +33,7 @@ class CreateTeam implements ShouldQueue
      */
     public function handle(): void
     {
-        $job = new MsController();
-        $job->CreateTeams($this->team_name, $this->class_id, $this->description);
+        $job = new TeamController();
+        $job->createTeams($this->team_name, $this->class_id, $this->description);
     }
 }

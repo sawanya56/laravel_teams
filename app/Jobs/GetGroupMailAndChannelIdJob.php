@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Http\Controllers\MsController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,7 +32,7 @@ class GetGroupMailAndChannelIdJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $job = new MsController();
+        $job = new TeamController();
         $access_token = $job->getAccessTokenDatabase();
         $job->getGroupmail($this->team_id, $this->class_id, $access_token);
         $job->getChannel($this->team_id, $this->class_id, $access_token);

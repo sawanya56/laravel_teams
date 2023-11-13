@@ -365,4 +365,43 @@ class TeamController extends Controller
             'end_time' => $new_end_time,
         ];
     }
+
+    public function deleteAllGroup($team_id, $class_id, $access_token)
+    {
+        // $access_token = $this->getAccessToken();
+        $end_point = "https://graph.microsoft.com/v1.0/groups/" . $team_id;
+        $response = Http::withToken($access_token)->delete($end_point);
+
+        DB::beginTransaction();
+        DB::table('class')->where('class_id', '=', $class_id)->update([
+            'team_id' => null,
+            'add_student' => null,
+            'add_event' => null,
+            'add_instructor' => null,
+        ]);
+        DB::commit();
+    }
+
+    public function RemoveEvent($class_id)
+    {
+        $events = DB::table('class')->where('class_id', '=', $class_id)->get();
+        dd($events);
+        foreach ($events as $event) {
+
+            $token = env('TOKEN');
+            $endpoint = "https://graph.microsoft.com/v1.0/me/events/". $event->event_id;
+            
+            $response = Http::withToken($token)->delete($endpoint);
+            $json = $response->json();
+
+            if (isset($json['error'])) {
+                echo $event->event_id . "<br><br>";
+            } else {
+                dd($json);
+            }
+        }
+       
+    }
+
+   
 }

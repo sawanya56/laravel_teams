@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Http\Controllers\MsController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -29,7 +30,7 @@ class CreateEventJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $job = new MsController();
-        $job->CreateEvent($this->class_id);
+        $job = new TeamController();
+        $job->createEvent($this->class_id);
     }
 }

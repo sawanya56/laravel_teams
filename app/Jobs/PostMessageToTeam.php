@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Http\Controllers\MsController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -29,7 +30,7 @@ class PostMessageToTeam implements ShouldQueue
      */
     public function handle(): void
     {
-        $job = new MsController();
-        $job->postMessageToTeam($this->team_id, $this->class_id);
+        $job = new TeamController();
+        $job->postMeetingToTeam($this->team_id, $this->class_id);
     }
 }

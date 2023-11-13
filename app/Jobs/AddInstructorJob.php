@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Http\Controllers\MsController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,11 +20,13 @@ class AddInstructorJob implements ShouldQueue
      */
     private $class_id;
     private $team_id;
+    private $email;
 
-    public function __construct($class_id, $team_id)
+    public function __construct($class_id, $team_id,$email)
     {
         $this->class_id = $class_id;
         $this->team_id = $team_id;
+        $this->email = $email;
     }
 
     /**
@@ -31,7 +34,7 @@ class AddInstructorJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $job = new MsController();
-        $job->AddInstructor($this->class_id, $this->team_id);
+        $job = new TeamController();
+        $job->addInstructor($this->class_id, $this->team_id, $this->email);
     }
 }

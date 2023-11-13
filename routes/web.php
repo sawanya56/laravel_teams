@@ -30,23 +30,26 @@ Route::get('team/student/add', [TeamController::class, 'addStudent']);
 Route::get('team/student/remove', [TeamController::class, 'removeStudent']);
 Route::get('team/event/create', [TeamController::class, 'createEvent']);
 Route::get('team/post/massage', [TeamController::class, 'postMeetingToTeam']);
+Route::get('team/delete/room', [TeamController::class, 'deleteAllGroup']);
+Route::get('team/delete/event', [TeamController::class, 'RemoveEvent']);
 // Route::get('test', [MsController::class, 'CreateEvent']);
 
 // Route::get('team/token', [MsController::class, 'getAccessTokenDatabase']);
 
-// Route::get('team/create', [MsController::class, 'processQueueCreateTeam']);
-
-// Route::get('team/student/add', [MsController::class, 'processQueueAddStudent']);
-// Route::get('team/instructor/add', [MsController::class, 'processQueueAddInstructor']);
-// Route::get('team/event/create', [MsController::class, 'porcessQueueCreateEvent']);
-// Route::get('team/post/massage', [MsController::class, 'processQueuePostMessageToTeam']);
-// Route::get('team/student/delete', [MsController::class, 'RemoveMember']);
-
-// Route::get('groupmail', [MsController::class, 'getGroupmail']);
-
-// Route::get('team/delete/event', [MsController::class, 'RemoveEvent']);
-// Route::get('team/delete', [MsController::class, 'processQueueDeleteAllTeam']);
+Route::get('queue/create/room', [QueueController::class, 'processQueueCreateTeam']);
+Route::get('queue/instructor/add', [QueueController::class, 'processQueueAddInstructor']);
+Route::get('queue/student/add', [QueueController::class, 'processQueueAddStudent']);
+Route::get('queue/event/create', [QueueController::class, 'processQueueCreateEvent']);
+Route::get('queue/post/massage', [QueueController::class, 'processQueuePostMessageToTeam']);
+Route::get('queue/get/groupmail', [QueueController::class, 'getGroupMailAndChannelId']);
+Route::get('queue/get/groupmail', [QueueController::class, 'getGroupMailAndChannelId']);
 // Route::get('team/event/delete', [MsController::class, 'deleteAllEvent']);
+// Route::get('team/delete', [MsController::class, 'processQueueDeleteAllTeam']);
+
+
+// Route::get('team/student/delete', [MsController::class, 'RemoveMember']);
+// Route::get('groupmail', [MsController::class, 'getGroupmail']);
+// Route::get('team/delete/event', [MsController::class, 'RemoveEvent']);
 // Route::get('team/event/create', [MsController::class, 'porcessQueueCreateEvent']);
 
 Route::get('/main', [MainController::class, 'main'])->name('main');
