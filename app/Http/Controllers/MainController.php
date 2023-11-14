@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CreateTeam;
 use App\Models\ClassModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,13 +37,11 @@ class MainController extends Controller
 
     public function addOwner(Request $request)
     {
-        // dd($request->all());
         $instructor_mail = $request->email;
         $team_id = $request->team_id;
         $class_id = $request->class_id;
 
-        $msTeam = new TeamController();
-        $access_token = $msTeam->getAccessTokenDatabase();
+        $access_token = parent::getAccessToken();
 
         $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/owners/$ref';
         $instructor_mail = "https://graph.microsoft.com/v1.0/users/" . $instructor_mail;
@@ -160,10 +159,12 @@ class MainController extends Controller
         $start_time = $request->start_time;
         $end_time = $request->end_time;
         $duration_time = $request->duration_time;
-
+    
+        $class_id = uniqid();
         $model = new ClassModel();
-        $result = $model->insertClass($team_name, $course_code, $section, $week_of_day, $start_time, $end_time, $duration_time);
-        // dd($request->all());
+        $result = $model->insertClass($class_id,$team_name, $course_code, $section, $week_of_day, $start_time, $end_time, $duration_time);
+        
+        CreateTeam::dispatch($team_name,$class_id,"-");
 
         if ($result == true) {
             return response()->json([

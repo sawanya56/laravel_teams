@@ -46,7 +46,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href={{ route('main') }}>
+                <a class="nav-link" href={{ route('home') }}>
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Ms Class</span></a>
             </li>
@@ -61,14 +61,14 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href={{ route('class/create') }} data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
+                <a class="nav-link collapsed" href={{ route('class/create') }} data-toggle="collapse"
+                    data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Class Room</span>
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                       
+
                         <a class="collapse-item" href={{ route('class/create') }}>Create Class</a>
                         <a class="collapse-item" href="cards.html">Cards</a>
                     </div>
@@ -348,15 +348,19 @@
                                     Activity Log
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal"
-                                    data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
+
+  
+                              
+
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button class="dropdown-item"> <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout</button>
+                                </form>
                             </div>
                         </li>
 
                     </ul>
+
 
                 </nav>
                 <!-- End of Topbar -->
@@ -364,7 +368,7 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                   @yield('container')
+                    @yield('container')
 
                 </div>
                 <!-- /.container-fluid -->

@@ -13,7 +13,7 @@ class ClassModel extends Model
     protected $fillable = [
         'year','term','team_name','course_code', 'section','week_of_day','start_time','end_time','duration_time','class_id'
     ];
-    public function insertClass($team_name, $course_code, $section, $week_of_day, $start_time, $end_time, $duration_time)
+    public function insertClass($class_id,$team_name, $course_code, $section, $week_of_day, $start_time, $end_time, $duration_time)
     {
         $model = new ClassModel();
 
@@ -26,7 +26,7 @@ class ClassModel extends Model
         $model->start_time = $start_time;
         $model->end_time = $end_time;
         $model->duration_time = $duration_time;
-        $model->class_id = uniqid();
+        $model->class_id = $class_id;
 
         $model->save();
 

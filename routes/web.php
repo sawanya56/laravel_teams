@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\AddDropController;
 use App\Http\Controllers\MainController;
-use App\Http\Controllers\MsController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
@@ -18,74 +16,39 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::get('/', function () {
-    return view('app');
-});
+Route::get('/', [MainController::class,'main'])->name('home');
 
-
-
-Route::get('team/create/room', [TeamController::class, 'createTeams']);
-Route::get('team/instructor/add', [TeamController::class, 'addInstructor']);
-Route::get('team/student/add', [TeamController::class, 'addStudent']);
-Route::get('team/student/remove', [TeamController::class, 'removeStudent']);
-Route::get('team/event/create', [TeamController::class, 'createEvent']);
-Route::get('team/post/massage', [TeamController::class, 'postMeetingToTeam']);
-Route::get('team/delete/room', [TeamController::class, 'deleteAllGroup']);
-Route::get('team/delete/event', [TeamController::class, 'RemoveEvent']);
-// Route::get('test', [MsController::class, 'CreateEvent']);
-
-// Route::get('team/token', [MsController::class, 'getAccessTokenDatabase']);
-
-Route::get('queue/create/room', [QueueController::class, 'processQueueCreateTeam']);
-Route::get('queue/instructor/add', [QueueController::class, 'processQueueAddInstructor']);
-Route::get('queue/student/add', [QueueController::class, 'processQueueAddStudent']);
-Route::get('queue/event/create', [QueueController::class, 'processQueueCreateEvent']);
-Route::get('queue/post/massage', [QueueController::class, 'processQueuePostMessageToTeam']);
-Route::get('queue/get/groupmail', [QueueController::class, 'getGroupMailAndChannelId']);
-Route::get('queue/event/delete', [QueueController::class, 'deleteAllEvent']);
-Route::get('get/class', [QueueController::class, 'testNun']);
+Route::prefix('queue')->controller(QueueController::class)->group(function () {
+    Route::get('/create/room', 'processQueueCreateTeam');
+    Route::get('/instructor/add', 'processQueueAddInstructor');
+    Route::get('/student/add', 'processQueueAddStudent');
+    Route::get('/event/create', 'processQueueCreateEvent');
+    Route::get('/event/delete', 'deleteAllEvent');
+    Route::get('/get/class', 'testNun');
 // Route::get('team/event/delete', [MsController::class, 'deleteAllEvent']);
 // Route::get('team/delete', [MsController::class, 'processQueueDeleteAllTeam']);
+});
 
-
-// Route::get('team/student/delete', [MsController::class, 'RemoveMember']);
-// Route::get('groupmail', [MsController::class, 'getGroupmail']);
-// Route::get('team/delete/event', [MsController::class, 'RemoveEvent']);
-// Route::get('team/event/create', [MsController::class, 'porcessQueueCreateEvent']);
-
-Route::get('/main', [MainController::class, 'main'])->name('main');
-Route::get('/class/detail/{id}', [MainController::class, 'getClassDetail']);
-
-// Route::post('/class/add/owner', [MainController::class, 'addOwner']);
 // Route::post('/team/delete/all', [MainController::class, 'deleteTeam']);
 
-Route::get('/class/create', [MainController::class, 'getClassCreate'])->name('class/create');
-Route::post('/class/create', [MainController::class, 'postClassCreate']);
-Route::post('/class/add/student', [MainController::class, 'postAddStudent']);
-Route::post('/class/remove/student', [MainController::class, 'postRemoveStudent']);
+Route::prefix('class')->controller(MainController::class)->group(function () {
+    Route::get('/create', 'getClassCreate')->name('class/create');
+    Route::post('/create', 'postClassCreate');
 
+    Route::post('/add/student', 'postAddStudent');
+    Route::post('/remove/student', 'postRemoveStudent');
+
+    Route::get('/detail/{id}',  'getClassDetail');
+    Route::post('/add/owner',  'addOwner');
+});
+
+Route::prefix('team')->controller(MainController::class)->group(function () {
+    Route::get('/create', 'getClassCreate');
+    Route::post('/create', 'postClassCreate');
+});
 
 // Route::get('/adddrop/add', [AddDropController::class, 'addStudent']);
 // Route::get('/adddrop/drop', [AddDropController::class, 'dropStudent']);
 
-
-Route::prefix('team')->controller(MainController::class)->group(function(){
-    Route::get('/create', 'getClassCreate');
-    Route::post('/create',  'postClassCreate');
-}); 
-
-
-
-Route::get('test', [QueueController::class, 'processQueueCreateTeam'])->name("nun");
-
 Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
-
-
-
-
-Route::get('/app', function () {
-    return view('app');
-});
-Route::get('/menu', function () {
-    return view('menu');
-});
+Auth::routes();
