@@ -107,7 +107,7 @@
                             @csrf
                             <div class="row">
                                 <div class="form-group col-md-10">
-                                    <input type="email" name="email" class="form-control" id="exampleInputEmail1"
+                                    <input type="text" name="student_code" class="form-control" id="student_code"
                                         aria-describedby="emailHelp" placeholder="Enter email">
                                     <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
                                     <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
@@ -143,7 +143,7 @@
                                                     value="{{ $class_detail->team_id }}">
                                                 <input type="hidden" name="class_id" value="{{ $row->class_id }}">
                                                 <input type="hidden" name="email" value="{{ $row->student_mail }}">
-                                                <button type="submit" class="styled-button-remove">Remove</button>
+                                                <button type="submit" class="btn btn-danger">Remove</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -155,4 +155,5 @@
             </div>
         </div>
     </div>
+
 @endsection

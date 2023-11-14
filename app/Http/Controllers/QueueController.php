@@ -102,21 +102,7 @@ class QueueController extends Controller
         }
     }
 
-    public function deleteAllGroup($team_id, $class_id, $access_token)
-    {
-        // $access_token = $this->getAccessToken();
-        $end_point = "https://graph.microsoft.com/v1.0/groups/" . $team_id;
-        $response = Http::withToken($access_token)->delete($end_point);
-
-        DB::beginTransaction();
-        DB::table('class')->where('class_id', '=', $class_id)->update([
-            'team_id' => null,
-            'add_student' => null,
-            'add_event' => null,
-            'add_instructor' => null,
-        ]);
-        DB::commit();
-    }
+    
 
     public function deleteAllEvent($team_id)
     {

@@ -25,7 +25,7 @@ class TeamController extends Controller
 
     ];
 
-    public function createTeams($team_name = 'Sert&Nune', $class_id = '65507988ad0a7', $description = 'มะน่อมะแน่งมั๊บ')
+    public function createTeams($team_name , $class_id, $description)
     {
         $access_token = parent::getAccessToken();
         $owner_email = 'sawanya_kck@mju.ac.th';
@@ -57,7 +57,7 @@ class TeamController extends Controller
         }
     }
 
-    public function addInstructor($class_id = '65507988ad0a7', $team_id = '8193fd40-1416-47b3-a207-ec19d5be0262', $instructor_mail = 'prasert_kb@mju.ac.th')
+    public function addInstructor($class_id , $team_id , $instructor_mail )
     {
         $access_token = parent::getAccessToken();
         $instructor_mail = strtolower($instructor_mail);
@@ -84,7 +84,7 @@ class TeamController extends Controller
         return $success;
     }
 
-    public function addStudent($class_id = '65507988ad0a7', $team_id = '8193fd40-1416-47b3-a207-ec19d5be0262', $student_id = '6204101356')
+    public function addStudent($class_id , $team_id, $student_id )
     {
         $model = new Enrollment();
 
@@ -116,7 +116,7 @@ class TeamController extends Controller
         return $success;
     }
 
-    public function removeStudent($team_id='8193fd40-1416-47b3-a207-ec19d5be0262', $student_id = '6204101356', $class_id= '65507988ad0a7')
+    public function removeStudent($team_id, $student_id , $class_id)
     {
         $token = parent::getAccessToken();
         $student_mail = 'MJU'. $student_id .'@mju.ac.th';
@@ -148,7 +148,7 @@ class TeamController extends Controller
         return false;
     }
 
-    public function createEvent($class_id = '65507988ad0a7')
+    public function createEvent($class_id)
     {
         $all_class = DB::table('class')->where('class_id', '=', $class_id)->get();
         foreach ($all_class as $class) {

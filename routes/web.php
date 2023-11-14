@@ -61,8 +61,8 @@ Route::get('/class/detail/{id}', [MainController::class, 'getClassDetail']);
 
 Route::get('/class/create', [MainController::class, 'getClassCreate'])->name('class/create');
 Route::post('/class/create', [MainController::class, 'postClassCreate']);
-// Route::post('/class/add/student', [MainController::class, 'postAddStudent']);
-// Route::post('/class/remove/student', [MainController::class, 'postRemoveStudent']);
+Route::post('/class/add/student', [MainController::class, 'postAddStudent']);
+Route::post('/class/remove/student', [MainController::class, 'postRemoveStudent']);
 
 
 // Route::get('/adddrop/add', [AddDropController::class, 'addStudent']);

@@ -26,8 +26,15 @@
                         </div>
                         <div class="form-group">
                             <label for="exampleInputEmail1" style="color: #1b25bb;">week_of_day</label>
-                            <input name="week_of_day" type="text" class="form-control" id="week_of_day"
-                                aria-describedby="emailHelp" placeholder="Enter week_of_day">
+                                <select class="form-control" name="week_of_day" id="week_of_day" >
+                                    <option>MO</option>
+                                    <option>TU</option>
+                                    <option>WE</option>
+                                    <option>TH</option>
+                                    <option>FR</option>
+                                    <option>SA</option>
+                                    <option>SU</option>
+                                  </select>
 
                         </div>
                         <div class="row">
@@ -104,7 +111,8 @@
                         .then(function(response) {
 
                             // console.log(response);
-                            if (response.status == 'success') {
+                            let data = response.status;
+                            if (data == 'success') {
                                 Swal.fire('Saved!', '', 'success')
 
                                 $('[data-dismiss="modal"]').trigger('click');

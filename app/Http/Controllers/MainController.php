@@ -41,7 +41,7 @@ class MainController extends Controller
         $team_id = $request->team_id;
         $class_id = $request->class_id;
 
-        $msTeam = new MsController();
+        $msTeam = new TeamController();
         $access_token = $msTeam->getAccessTokenDatabase();
 
         $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/owners/$ref';
@@ -87,13 +87,15 @@ class MainController extends Controller
     public function postAddStudent(Request $request)
     {
         // dd($request->all());
-        $student_mail = $request->email;
+        // $student_mail = $request->email;
+        $student_mail = $request->student_code;
         $team_id = $request->team_id;
         $class_id = $request->class_id;
+        // dd($class_id);
 
-        $model = new MsController();
+        $student_mail = "mju" . $student_mail . "@mju.ac.th";
 
-        $access_token = $model->getAccessToken();
+        $access_token = parent::getAccessToken();
 
         $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
         $student = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
@@ -105,6 +107,11 @@ class MainController extends Controller
 
         if ($valid) {
             $enroll = DB::table('enrollments')->where('class_id', '=', $class_id)->first();
+           
+            if ($enroll == null) {
+                $enroll = DB::table('class')->where('class_id', '=', $class_id)->first();
+            }
+    
             DB::table('enrollments')->insert([
                 'year' => $enroll->year,
                 'term' => $enroll->term,
@@ -114,6 +121,7 @@ class MainController extends Controller
                 'student_mail' => $student_mail,
                 'add_success' => 'success',
             ]);
+
             $request->session()->flash('message', 'Add Student Success');
             $request->session()->flash('alert', 'alert alert-success');
         } else {
@@ -132,7 +140,7 @@ class MainController extends Controller
     {
         $team_id = $request->team_id;
         $class_id = $request->class_id;
-        $model = new MsController();
+        $model = new TeamController();
         $model->deleteTeamAndDatabase($team_id, $class_id);
 
         return redirect('/main');
@@ -160,12 +168,12 @@ class MainController extends Controller
         if ($result == true) {
             return response()->json([
                 'status' => 'success',
-                
+
             ]);
-        }else{
+        } else {
             return response()->json([
-                'status'=> 'fail'
-                ]);
+                'status' => 'fail',
+            ]);
         }
         // return redirect('class/create');
     }
@@ -176,7 +184,7 @@ class MainController extends Controller
         $team_id = $request->team_id;
         $student_mail = $request->email;
         $class_id = $request->class_id;
-        $model = new MsController();
+        $model = new TeamController();
         $token = $model->getAccessToken();
         $getMembersUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members";
         $response = Http::withToken($token)->get($getMembersUrl);
@@ -187,7 +195,7 @@ class MainController extends Controller
             if (strtolower($member['email']) === strtolower($student_mail)) {
 
                 $memberId = $member['id'];
-                $token = $model->getAccessTokenDatabase();
+                $token = parent::getAccessToken();
                 $removeMemberUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members/" . $memberId;
                 $response = Http::withToken($token)->delete($removeMemberUrl);
                 if ($response->successful()) {
