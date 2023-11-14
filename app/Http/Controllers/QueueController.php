@@ -5,15 +5,15 @@ namespace App\Http\Controllers;
 use App\Jobs\AddInstructorJob;
 use App\Jobs\AddStudentJob;
 use App\Jobs\CreateEventJob;
+use App\Jobs\CreateTeam;
 use App\Jobs\GetGroupMailAndChannelIdJob;
 use App\Jobs\PostMessageToTeam;
-use Illuminate\Http\Request;
-use Exception;
+use App\Models\Enrollment;
+use App\Models\Instructor;
 use App\Models\MjuClass;
-use App\Jobs\CreateTeam;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-
 
 class QueueController extends Controller
 {
@@ -25,7 +25,7 @@ class QueueController extends Controller
                 $team_name = $class->team_name;
                 $class_id = $class->class_id;
                 $description = $class->getCourse->description;
-                if($description==null){
+                if ($description == null) {
                     $description = 'Not Description';
                 }
                 dispatch(new CreateTeam($team_name, $class_id, $description));
@@ -43,26 +43,28 @@ class QueueController extends Controller
     {
         // $model = new MjuClass();
         // $all_class = $model->getClassInstructorNull();
-        $all_class = DB::table('view_ins')->get();
-
-        foreach ($all_class as $class) {
-            $class_id = $class->class_id;
-            $team_id = $class->team_id;
-            $email = $class->email;
-            if($email != null){
-                dispatch(new AddInstructorJob($class_id, $team_id,$email));
-            }  
+        // $all_class = DB::table('view_ins')->get();
+        $instructors = new Instructor();
+        $teachers = $instructors->getInstructorClass();
+        foreach ($teachers as $ins) {
+            $class_id = $ins->class_id;
+            $team_id = $ins->getClassDetail->team_id;
+            $email = $ins->email;
+            if ($email != null) {
+                dispatch(new AddInstructorJob($class_id, $team_id, $email));
+            }
         }
     }
 
     public function processQueueAddStudent()
     {
         // dispatch(new AddStudentJob(337152, '221d70ec-bea1-485b-91b6-7f6c7d07f0da'));
-        $all_class = DB::table('view_students')->get();
-        foreach ($all_class as $class) {
-            $class_id = $class->class_id;
-            $team_id = $class->team_id;
-            $student_code = $class->student_code;
+        $enroll = new Enrollment();
+        $students = $enroll->getStudentClass();
+        foreach ($students as $student) {
+            $class_id = $student->class_id;
+            $team_id = $student->getClass->team_id;
+            $student_code = $student->student_code;
             dispatch(new AddStudentJob($class_id, $team_id, $student_code));
         }
     }
@@ -73,7 +75,7 @@ class QueueController extends Controller
             ->whereNotNull('team_id')
             ->whereNull('add_event')
             ->groupBy('class_id')
-            ->limit(100)
+            ->limit(100)                                            
             ->get();
         // dd($all_class);
         foreach ($all_class as $class) {
@@ -136,6 +138,16 @@ class QueueController extends Controller
         }
     }
 
-   
+    public function testNun()
+    {
+        $instructors = new Instructor();
+        $teachers = $instructors->getInstructorClass();
 
+        foreach ($teachers as $ins) {
+            $team_id = $ins->getClassDetail->team_id;
+            dd( $ins->getClassDetail);
+           
+        }
+
+    }
 }

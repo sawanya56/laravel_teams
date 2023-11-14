@@ -40,4 +40,13 @@ class Enrollment extends Model
         }
         return false;
     }
+
+    public function getClass(){
+        return $this->hasOne(MjuClass::class,"class_id","class_id");
+    }
+
+    public function getStudentClass(){
+       return Enrollment::whereNull('add_success')->get();
+
+    }
 }

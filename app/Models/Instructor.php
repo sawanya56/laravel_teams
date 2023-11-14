@@ -47,4 +47,13 @@ class Instructor extends Model
         $model->add_success = $status;
         $model->save();
     }
+
+    public function getClassDetail(){
+        return $this->hasOne(MjuClass::class,"class_id","class_id");
+    }
+
+    public function getInstructorClass(){
+        return Instructor::whereNull('add_success')->get();
+ 
+     }
 }

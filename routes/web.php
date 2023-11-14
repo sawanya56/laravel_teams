@@ -42,7 +42,8 @@ Route::get('queue/student/add', [QueueController::class, 'processQueueAddStudent
 Route::get('queue/event/create', [QueueController::class, 'processQueueCreateEvent']);
 Route::get('queue/post/massage', [QueueController::class, 'processQueuePostMessageToTeam']);
 Route::get('queue/get/groupmail', [QueueController::class, 'getGroupMailAndChannelId']);
-Route::get('queue/get/groupmail', [QueueController::class, 'getGroupMailAndChannelId']);
+Route::get('queue/event/delete', [QueueController::class, 'deleteAllEvent']);
+Route::get('get/class', [QueueController::class, 'testNun']);
 // Route::get('team/event/delete', [MsController::class, 'deleteAllEvent']);
 // Route::get('team/delete', [MsController::class, 'processQueueDeleteAllTeam']);
 
