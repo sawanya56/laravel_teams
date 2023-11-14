@@ -26,15 +26,15 @@
                         </div>
                         <div class="form-group">
                             <label for="exampleInputEmail1" style="color: #1b25bb;">week_of_day</label>
-                                <select class="form-control" name="week_of_day" id="week_of_day" >
-                                    <option>MO</option>
-                                    <option>TU</option>
-                                    <option>WE</option>
-                                    <option>TH</option>
-                                    <option>FR</option>
-                                    <option>SA</option>
-                                    <option>SU</option>
-                                  </select>
+                            <select class="form-control" name="week_of_day" id="week_of_day">
+                                <option>MO</option>
+                                <option>TU</option>
+                                <option>WE</option>
+                                <option>TH</option>
+                                <option>FR</option>
+                                <option>SA</option>
+                                <option>SU</option>
+                            </select>
 
                         </div>
                         <div class="row">
@@ -66,7 +66,7 @@
                             <div class="col-3"></div>
                             <div class="col-3"></div>
                             <div class="col-3">
-                                <button type="submit" id="btn_save" class="btn btn-block btn-success">Submit</button>
+                                <button type="button" id="btn_save" class="btn btn-block btn-success">Submit</button>
                             </div>
                         </div>
                     </form>
@@ -74,8 +74,10 @@
             </div>
         </div>
     </div>
+@endsection
 
 
+@section('script')
     <script>
         $('#btn_save').click(function() {
             Swal.fire({
@@ -120,7 +122,7 @@
 
                         });
                 }
-            })
-        })
+            });
+        });
     </script>
 @endsection

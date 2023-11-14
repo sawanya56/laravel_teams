@@ -349,12 +349,14 @@
                                 </a>
                                 <div class="dropdown-divider"></div>
 
-  
-                              
+
+
 
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST">
                                     @csrf
-                                    <button class="dropdown-item"> <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout</button>
+                                    <button class="dropdown-item"> <i
+                                            class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Logout</button>
                                 </form>
                             </div>
                         </li>
@@ -433,6 +435,11 @@
 
     <!-- Page level custom scripts -->
     <script src="/template/js/demo/datatables-demo.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    @yield('script')
 
 </body>
 
