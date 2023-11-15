@@ -6,11 +6,11 @@
             <div class="col-12">
                 <div class="card border-0" style=" box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                     <div class="card-body">
-                        <h5 style="color:rgb(2, 0, 138); font-size: 25px" ><b>{{ $class_detail->team_name }}</b></h5>
+                        <h5 style="color:rgb(2, 0, 138); font-size: 25px"><b>{{ $class_detail->team_name }}</b></h5>
                         <h5>{{ $class_detail->calendar_subject }}</h5>
                         <h5>Team ID : {{ $class_detail->team_id }}</h5>
                         <h5>Channel ID : {{ $class_detail->channel_id }}</h5>
-                        <h5 >CLASS ID : {{ $class_detail->class_id }}</h5>
+                        <h5>CLASS ID : {{ $class_detail->class_id }}</h5>
 
                         @foreach ($schedules as $item)
                             <h5> day :{{ $item->week_of_day }} {{ $item->start_time }}</h5>
@@ -25,12 +25,15 @@
                             <div class="col-3"></div>
                             <div class="col-2"></div>
                             <div class="col-4">
-                                <button class="btn btn-danger" id="btnDelete">DELETE TEAM WITH DATABASE</button>
-                                <form action="/team/delete/all" method="post" id="formDelete">
-                                    <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
-                                    <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
+                                <button class="btn btn-danger" id="btn_delete_team">DELETE TEAM WITH DATABASE</button>
+                                <form action="/team/delete/all" method="post" id="form_delete">
+                                    <input type="hidden" name="class_id" id="team_id"
+                                        value="{{ $class_detail->class_id }}">
+                                    <input type="hidden" name="team_id" id="class_id"
+                                        value="{{ $class_detail->team_id }}">
                                     @csrf
                                 </form>
+
                             </div>
                         </div>
                     </div>
@@ -156,4 +159,35 @@
         </div>
     </div>
 
+    <script>
+       
+
+        function handleDelete() {
+            Swal.fire({
+                title: 'Do you want to delete?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, submit the form
+                    document.getElementById('form_delete').submit();
+                    Swal.fire({
+                        title: 'Deleting...',
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 1500 
+                    }).then(() => {
+                        window.location.href = '/home';
+                    });
+                }
+            });
+        }
+
+        // Attach the handleDelete function to the button click event
+        document.getElementById('btn_delete_team').addEventListener('click', handleDelete);
+    </script>
 @endsection

@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\QueueController;
-use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::get('/', [MainController::class,'main'])->name('home');
+Route::get('/', [MainController::class, 'main'])->name('home');
 
 Route::prefix('queue')->controller(QueueController::class)->group(function () {
     Route::get('/create/room', 'processQueueCreateTeam');
@@ -29,8 +28,6 @@ Route::prefix('queue')->controller(QueueController::class)->group(function () {
 // Route::get('team/delete', [MsController::class, 'processQueueDeleteAllTeam']);
 });
 
-// Route::post('/team/delete/all', [MainController::class, 'deleteTeam']);
-
 Route::prefix('class')->controller(MainController::class)->group(function () {
     Route::get('/create', 'getClassCreate')->name('class/create');
     Route::post('/create', 'postClassCreate');
@@ -38,13 +35,14 @@ Route::prefix('class')->controller(MainController::class)->group(function () {
     Route::post('/add/student', 'postAddStudent');
     Route::post('/remove/student', 'postRemoveStudent');
 
-    Route::get('/detail/{id}',  'getClassDetail');
-    Route::post('/add/owner',  'addOwner');
+    Route::get('/detail/{id}', 'getClassDetail');
+    Route::post('/add/owner', 'addOwner');
 });
 
 Route::prefix('team')->controller(MainController::class)->group(function () {
     Route::get('/create', 'getClassCreate');
     Route::post('/create', 'postClassCreate');
+    Route::post('/delete/all', 'deleteTeam');
 });
 
 // Route::get('/adddrop/add', [AddDropController::class, 'addStudent']);

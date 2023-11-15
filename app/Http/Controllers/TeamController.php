@@ -403,5 +403,15 @@ class TeamController extends Controller
        
     }
 
+    public function deleteTeamAndDatabase($team_id, $class_id)
+    {
+        $access_token = parent::getAccessToken();
+        $end_point = "https://graph.microsoft.com/v1.0/groups/" . $team_id;
+        $response = Http::withToken($access_token)->delete($end_point);
+
+        DB::beginTransaction();
+        DB::table('class')->where('class_id', '=', $class_id)->delete();
+        DB::commit();
+    }
    
 }

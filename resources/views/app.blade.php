@@ -23,6 +23,13 @@
     <!-- Custom styles for this page -->
     <link href="/template/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
 </head>
 
 <body id="page-top">
@@ -437,7 +444,7 @@
     <script src="/template/js/demo/datatables-demo.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     @yield('script')
 

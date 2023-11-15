@@ -59,8 +59,8 @@
                         </div>
                         <div class="row">
                             <div class="col-3">
-                                <a href="/main">
-                                    <button type="button" class="btn btn-primary">Back</button>
+                                <a href="/class/create">
+                                    <button type="button" class="btn btn-primary" >Back</button>
                                 </a>
                             </div>
                             <div class="col-3"></div>
@@ -86,8 +86,8 @@
                 showCancelButton: true,
                 confirmButtonText: 'Save',
                 denyButtonText: `Don't save`,
+                icon: "info" // Use the info icon for the confirmation dialog
             }).then((result) => {
-
                 if (result.isConfirmed) {
                     let team_name = $('#team_name').val();
                     let course_code = $('#course_code').val();
@@ -96,31 +96,32 @@
                     let start_time = $('#start_time').val();
                     let end_time = $('#end_time').val();
                     let duration_time = $('#duration_time').val();
+
                     axios({
-                            method: 'post',
-                            url: '/api/class/create',
-                            data: {
-                                team_name: team_name,
-                                course_code: course_code,
-                                section: section,
-                                week_of_day: week_of_day,
-                                start_time: start_time,
-                                end_time: end_time,
-                                duration_time: duration_time,
-                            },
-                            responseType: 'json'
-                        })
-                        .then(function(response) {
-
-                            // console.log(response);
-                            let data = response.status;
-                            if (data == 'success') {
-                                Swal.fire('Saved!', '', 'success')
-
-                                $('[data-dismiss="modal"]').trigger('click');
-                            }
-
-                        });
+                        method: 'post',
+                        url: '/api/class/create',
+                        data: {
+                            team_name: team_name,
+                            course_code: course_code,
+                            section: section,
+                            week_of_day: week_of_day,
+                            start_time: start_time,
+                            end_time: end_time,
+                            duration_time: duration_time,
+                        },
+                        responseType: 'json'
+                    }).then(function(response) {
+                        let data = response.data;
+                        // console.log(data);
+                        if (data.status == "success") {
+                            Swal.fire('Saved!', '', 'success');
+                            $('[data-dismiss="modal"]').trigger('click');
+                        }
+                    }).catch(function(error) {
+                        console.error('Error in Axios request:', error);
+                    });
+                } else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info');
                 }
             });
         });
