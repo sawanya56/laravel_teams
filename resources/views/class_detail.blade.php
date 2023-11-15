@@ -161,7 +161,7 @@
     </div>
 
     <script>
-        function handleDelete() {
+        function handleDeleteStudent() {
             Swal.fire({
                 title: 'Do you want to delete?',
                 text: 'This action cannot be undone.',
@@ -208,30 +208,27 @@
             });
         });
 
+
         document.getElementById('btn_delete_student').addEventListener('click', function() {
             Swal.fire({
-                title: 'Are you sure?',
-                text: 'Do you want to remove this student?',
-                icon: 'question',
+                title: 'Do you want to delete?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, remove it!'
+                confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // If confirmed, submit the form using AJAX
-                    $.ajax({
-                        type: 'POST',
-                        url: '/class/remove/student',
-                        data: $('#removeStudentForm').serialize(),
-                        success: function(response) {
-                            Swal.fire('Removed!', '', 'success');
-                            $('[data-dismiss="modal"]').trigger('click');
-                        },
-                        error: function(error) {
-                            Swal.fire('Error!', 'An error occurred while removing the student.',
-                                'error');
-                        }
+                    // If confirmed, submit the form
+                    Swal.fire({
+                        title: 'Deleting...',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        // Submit the form
+                        document.getElementById('removeStudentForm').submit();
                     });
                 }
             });

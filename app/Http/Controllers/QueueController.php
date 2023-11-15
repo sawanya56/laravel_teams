@@ -24,13 +24,16 @@ class QueueController extends Controller
             try {
                 $team_name = $class->team_name;
                 $class_id = $class->class_id;
-                $description = $class->getCourse->description;
+                $description = $class?->getCourse?->description;
+
                 if ($description == null) {
                     $description = 'Not Description';
-                }
-                dispatch(new CreateTeam($team_name, $class_id, $description));
-                // echo($description."<br>");00000
+                } 
+
+                CreateTeam::dispatch($team_name, $class_id, $description);
+
             } catch (Exception $e) {
+                dd($class, $class->getCourse);
                 echo $e->getMessage();
                 echo $class_id . "<br>";
             }
@@ -46,13 +49,17 @@ class QueueController extends Controller
         // $all_class = DB::table('view_ins')->get();
         $instructors = new Instructor();
         $teachers = $instructors->getInstructorClass();
+        // dd($teachers->count());
         foreach ($teachers as $ins) {
             $class_id = $ins->class_id;
-            $team_id = $ins->getClassDetail->team_id;
+            $team_id = $ins?->getClassDetail?->team_id;
             $email = $ins->email;
-            if ($email != null) {
-                dispatch(new AddInstructorJob($class_id, $team_id, $email));
+
+
+            if ($team_id != null && $email != null) {
+                AddInstructorJob::dispatch($class_id, $team_id, $email);
             }
+
         }
     }
 
@@ -75,7 +82,7 @@ class QueueController extends Controller
             ->whereNotNull('team_id')
             ->whereNull('add_event')
             ->groupBy('class_id')
-            ->limit(100)                                            
+            ->limit(100)
             ->get();
         // dd($all_class);
         foreach ($all_class as $class) {
@@ -101,8 +108,6 @@ class QueueController extends Controller
             dispatch(new GetGroupMailAndChannelIdJob($class->class_id, $class->team_id));
         }
     }
-
-    
 
     public function deleteAllEvent($team_id)
     {
@@ -131,8 +136,8 @@ class QueueController extends Controller
 
         foreach ($teachers as $ins) {
             $team_id = $ins->getClassDetail->team_id;
-            dd( $ins->getClassDetail);
-           
+            dd($ins->getClassDetail);
+
         }
 
     }
