@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::get('/', [MainController::class, 'main'])->name('home');
+Route::get('/home', [MainController::class, 'main'])->name('home');
 
 Route::prefix('queue')->controller(QueueController::class)->group(function () {
     Route::get('/create/room', 'processQueueCreateTeam');

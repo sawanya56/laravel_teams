@@ -142,7 +142,7 @@ class MainController extends Controller
         $model = new TeamController();
         $model->deleteTeamAndDatabase($team_id, $class_id);
 
-        return redirect('/main');
+        return redirect('/home');
     }
 
     public function getClasscreate()

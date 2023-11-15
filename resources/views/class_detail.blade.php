@@ -18,7 +18,7 @@
 
                         <div class="row">
                             <div class="col-3">
-                                <a href="/main">
+                                <a href="/home">
                                     <button class="btn btn-primary">BACK</button>
                                 </a>
                             </div>
@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <div class="row mt-2">
+        {{-- <div class="row mt-2">
             <div class="col-12">
                 @if (Session::has('message'))
                     <div class="{{ Session::get('alert') }}" role="alert">
@@ -49,7 +49,7 @@
                     </div>
                 @endif
             </div>
-        </div>
+        </div> --}}
 
         {{-- INSTRUCTOR --}}
         <div class="row mt-4">
@@ -109,7 +109,7 @@
                         <form method="post" action="/class/add/student" class="pagination-info">
                             @csrf
                             <div class="row">
-                                <div class="form-group col-md-10">
+                                <div class="form-group col-md-10" id="add_student">
                                     <input type="text" name="student_code" class="form-control" id="student_code"
                                         aria-describedby="emailHelp" placeholder="Enter email">
                                     <input type="hidden" name="team_id" value="{{ $class_detail->team_id }}">
@@ -117,7 +117,7 @@
                                 </div>
 
                                 <div class="form-group col-md-2">
-                                    <button type="submit" class="btn btn-primary">Add Student</button>
+                                    <button type="submit" class="btn btn-primary" id="btn_add_student">Add Student</button>
                                 </div>
                             </div>
                         </form>
@@ -140,13 +140,14 @@
                                         <td style="color: green">{{ $row->add_success }}</td>
                                         <td style="color: green">
                                             <form action="/class/remove/student" method="post"
-                                                onsubmit="return confirm('ลบไหม?');">
+                                                id="removeStudentForm"{{-- onsubmit="return confirm('ลบไหม?');"> --}}>
                                                 @csrf
                                                 <input type="hidden" name="team_id"
                                                     value="{{ $class_detail->team_id }}">
                                                 <input type="hidden" name="class_id" value="{{ $row->class_id }}">
                                                 <input type="hidden" name="email" value="{{ $row->student_mail }}">
-                                                <button type="submit" class="btn btn-danger">Remove</button>
+                                                <button type="submit" class="btn btn-danger"
+                                                    id="btn_delete_student">Remove</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -160,8 +161,6 @@
     </div>
 
     <script>
-       
-
         function handleDelete() {
             Swal.fire({
                 title: 'Do you want to delete?',
@@ -174,14 +173,15 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // If confirmed, submit the form
-                    document.getElementById('form_delete').submit();
                     Swal.fire({
                         title: 'Deleting...',
-                        icon: 'error',
+                        icon: 'success',
                         showConfirmButton: false,
-                        timer: 1500 
+                        timer: 1500
                     }).then(() => {
+                        document.getElementById('form_delete').submit();
                         window.location.href = '/home';
+
                     });
                 }
             });
@@ -189,5 +189,52 @@
 
         // Attach the handleDelete function to the button click event
         document.getElementById('btn_delete_team').addEventListener('click', handleDelete);
+
+        document.getElementById('btn_add_student').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Add Student Success?',
+                icon: 'success',
+                showCancelButton: true,
+
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, submit the form
+                    document.getElementById('addStudentForm').submit();
+
+                    // Show success notification
+                    Swal.fire('Saved!', '', 'success');
+                    $('[data-dismiss="modal"]').trigger('click');
+                }
+            });
+        });
+
+        document.getElementById('btn_delete_student').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to remove this student?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, remove it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, submit the form using AJAX
+                    $.ajax({
+                        type: 'POST',
+                        url: '/class/remove/student',
+                        data: $('#removeStudentForm').serialize(),
+                        success: function(response) {
+                            Swal.fire('Removed!', '', 'success');
+                            $('[data-dismiss="modal"]').trigger('click');
+                        },
+                        error: function(error) {
+                            Swal.fire('Error!', 'An error occurred while removing the student.',
+                                'error');
+                        }
+                    });
+                }
+            });
+        });
     </script>
 @endsection
