@@ -26,6 +26,7 @@ Route::prefix('queue')->controller(QueueController::class)->group(function () {
     Route::get('/get/class', 'testNun');
 // Route::get('team/event/delete', [MsController::class, 'deleteAllEvent']);
 // Route::get('team/delete', [MsController::class, 'processQueueDeleteAllTeam']);
+    Route::get('/remove/me', 'removeMeAllTeam');
 });
 
 Route::prefix('class')->controller(MainController::class)->group(function () {
@@ -34,6 +35,7 @@ Route::prefix('class')->controller(MainController::class)->group(function () {
 
     Route::post('/add/student', 'postAddStudent');
     Route::post('/remove/student', 'postRemoveStudent');
+    Route::get('/remove/me', 'postRemoveMe');
 
     Route::get('/detail/{id}', 'getClassDetail');
     Route::post('/add/owner', 'addOwner');

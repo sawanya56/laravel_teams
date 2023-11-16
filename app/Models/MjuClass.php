@@ -25,7 +25,11 @@ class MjuClass extends Model
     }
 
     public function getAllClass(){
-        MjuClass::whereNull('team_id')->get();
+        return MjuClass::whereNotNull('team_id')->get();
+    }
+
+    public function getAllClassGroupBy(){
+        return MjuClass::whereNotNull('team_id')->groupBy('class_id')->get();
     }
 
     public function getClassStudentNull()
@@ -43,5 +47,10 @@ class MjuClass extends Model
     public function getCourse()
     {
         return $this->belongsTo(\App\Models\Course::class, 'course_code', 'course_code');
+    }
+
+    public function getEnrollment(){
+        return $this->hasMany(Enrollment::class,'class_id','class_id');
+        
     }
 }

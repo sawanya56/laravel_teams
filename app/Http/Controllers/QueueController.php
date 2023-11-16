@@ -8,7 +8,7 @@ use App\Jobs\CreateEventJob;
 use App\Jobs\CreateTeam;
 use App\Jobs\GetGroupMailAndChannelIdJob;
 use App\Jobs\PostMessageToTeam;
-use App\Models\Enrollment;
+use App\Jobs\RemoveOwnerJob;
 use App\Models\Instructor;
 use App\Models\MjuClass;
 use Exception;
@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Http;
 
 class QueueController extends Controller
 {
+    public function __construct()
+    {
+        set_time_limit(3000);
+    }
     public function processQueueCreateTeam()
     {
         $all_class = MjuClass::whereNull('team_id')->groupBy('class_id')->get();
@@ -28,7 +32,7 @@ class QueueController extends Controller
 
                 if ($description == null) {
                     $description = 'Not Description';
-                } 
+                }
 
                 CreateTeam::dispatch($team_name, $class_id, $description);
 
@@ -55,9 +59,9 @@ class QueueController extends Controller
             $team_id = $ins?->getClassDetail?->team_id;
             $email = $ins->email;
 
-
             if ($team_id != null && $email != null) {
                 AddInstructorJob::dispatch($class_id, $team_id, $email);
+                // echo "" . $class_id . "" . $team_id;
             }
 
         }
@@ -65,15 +69,30 @@ class QueueController extends Controller
 
     public function processQueueAddStudent()
     {
-        // dispatch(new AddStudentJob(337152, '221d70ec-bea1-485b-91b6-7f6c7d07f0da'));
-        $enroll = new Enrollment();
-        $students = $enroll->getStudentClass();
-        foreach ($students as $student) {
-            $class_id = $student->class_id;
-            $team_id = $student->getClass->team_id;
-            $student_code = $student->student_code;
-            dispatch(new AddStudentJob($class_id, $team_id, $student_code));
+
+        $getClass = new MjuClass();
+        $class = $getClass->getAllClassGroupBy();
+
+        foreach ($class as $row) {
+            $team_id = $row->team_id;
+            if (count($row->getEnrollment) != 0) {
+                // dd($row->getEnrollment);
+
+                foreach ($row->getEnrollment as $student) {
+                    $class_id = $student->class_id;
+                    $student_code = $student->student_code;
+
+                    if ($student_code != null) {
+                        // dispatch(new AddStudentJob($class_id, $team_id, $student_code));
+                        AddStudentJob::dispatch($class_id, $team_id, $student_code);
+                    }
+
+                }
+
+            }
+
         }
+
     }
 
     public function processQueueCreateEvent()
@@ -82,7 +101,6 @@ class QueueController extends Controller
             ->whereNotNull('team_id')
             ->whereNull('add_event')
             ->groupBy('class_id')
-            ->limit(100)
             ->get();
         // dd($all_class);
         foreach ($all_class as $class) {
@@ -140,5 +158,16 @@ class QueueController extends Controller
 
         }
 
+    }
+
+    public function removeMeAllTeam()
+    {
+        $class = MjuClass::groupBy('class_id')->get();
+        foreach ($class as $row) {
+            $team_id = $row->team_id;
+            $student_mail = 'sawanya_kck@mju.ac.th';
+            $class_id = $row->class_id;
+            RemoveOwnerJob::dispatch($team_id, $student_mail, $class_id);
+        }
     }
 }

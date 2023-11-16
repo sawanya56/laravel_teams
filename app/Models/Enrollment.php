@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use PDO;
 
@@ -49,4 +50,6 @@ class Enrollment extends Model
        return Enrollment::whereNull('add_success')->get();
 
     }
+
+    
 }

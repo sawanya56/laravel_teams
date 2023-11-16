@@ -25,7 +25,7 @@ class TeamController extends Controller
 
     ];
 
-    public function createTeams($team_name , $class_id, $description)
+    public function createTeams($team_name, $class_id, $description)
     {
         $access_token = parent::getAccessToken();
         $owner_email = 'sawanya_kck@mju.ac.th';
@@ -57,7 +57,7 @@ class TeamController extends Controller
         }
     }
 
-    public function addInstructor($class_id , $team_id , $instructor_mail )
+    public function addInstructor($class_id, $team_id, $instructor_mail)
     {
         $access_token = parent::getAccessToken();
         $instructor_mail = strtolower($instructor_mail);
@@ -84,7 +84,7 @@ class TeamController extends Controller
         return $success;
     }
 
-    public function addStudent($class_id , $team_id, $student_id )
+    public function addStudent($class_id, $team_id, $student_id)
     {
         $model = new Enrollment();
 
@@ -116,10 +116,10 @@ class TeamController extends Controller
         return $success;
     }
 
-    public function removeStudent($team_id, $student_id , $class_id)
+    public function removeStudent($team_id, $student_id, $class_id)
     {
         $token = parent::getAccessToken();
-        $student_mail = 'MJU'. $student_id .'@mju.ac.th';
+        $student_mail = 'MJU' . $student_id . '@mju.ac.th';
         $getMembersUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members";
         $response = Http::withToken($token)->get($getMembersUrl);
         $members = $response->json()['value'] ?? [];
@@ -229,7 +229,7 @@ class TeamController extends Controller
                         ],
                     ],
                 ];
-                
+
                 // $token = parent::getAccessToken();
                 $token = parent::getAccessTokenOwner();
                 if ($token === false) {
@@ -241,8 +241,8 @@ class TeamController extends Controller
                 $response = Http::withToken($token)->post($endpoint, $data);
                 $response_data = $response->json();
                 $response_result = $response->successful();
-                
-                if ( $response_result == false) {
+
+                if ($response_result == false) {
                     MjuClass::where('class_id', '=', $class_id)->update([
                         'add_event' => json_encode($response_data),
                     ]);
@@ -258,8 +258,8 @@ class TeamController extends Controller
                     MjuClass::where('id', '=', $class->id)->update([
                         'event_id' => $event_id,
                         'event_body' => json_encode($body_content),
-                        'add_event' => 'success', 
-                     ]);
+                        'add_event' => 'success',
+                    ]);
                     $post_result = $this->postMeetingToTeam($team_id, $channel_id, $body_content, $team_name);
                     if ($post_result === true) {
                         MjuClass::where('id', '=', $class->id)->update([
@@ -271,7 +271,7 @@ class TeamController extends Controller
                         ]);
                     }
                 }
-              
+
             } catch (Exception $e) {
                 DB::table('class')->where('class_id', '=', $class_id)->update([
                     'add_event' => $e->getMessage(),
@@ -389,8 +389,8 @@ class TeamController extends Controller
         foreach ($events as $event) {
 
             $token = env('TOKEN');
-            $endpoint = "https://graph.microsoft.com/v1.0/me/events/". $event->event_id;
-            
+            $endpoint = "https://graph.microsoft.com/v1.0/me/events/" . $event->event_id;
+
             $response = Http::withToken($token)->delete($endpoint);
             $json = $response->json();
 
@@ -400,7 +400,7 @@ class TeamController extends Controller
                 dd($json);
             }
         }
-       
+
     }
 
     public function deleteTeamAndDatabase($team_id, $class_id)
@@ -413,5 +413,33 @@ class TeamController extends Controller
         DB::table('class')->where('class_id', '=', $class_id)->delete();
         DB::commit();
     }
-   
+
+    public function removeOwner($team_id, $student_mail, $class_id)
+    {
+    
+        $token = parent::getAccessToken();
+        $getOwnerUrl = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/owners";
+        $response = Http::withToken($token)->get($getOwnerUrl);
+        $owners = $response->json()['value'] ?? [];
+        $ownerId = null;
+
+        foreach ($owners as $owner) {
+            if (strtolower($owner['mail']) === strtolower($student_mail)) {
+                $ownerId = $owner['id'];
+                $token = parent::getAccessToken();
+                $removeOwnerUrl = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/owners/' . $ownerId . '/$ref';
+                $response = Http::withToken($token)->delete($removeOwnerUrl);
+                if ($response->successful()) {
+                    return true;
+                } else {
+                    return false;
+
+                }
+                break;
+            }
+        }
+
+       return false;
+    }
+
 }
