@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AddDropController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\QueueController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
  */
+Route::get('debugcode', [TeamController::class, 'removeMe']);
 
 Route::get('/home', [MainController::class, 'main'])->name('home');
 
@@ -27,7 +30,10 @@ Route::prefix('queue')->controller(QueueController::class)->group(function () {
 // Route::get('team/event/delete', [MsController::class, 'deleteAllEvent']);
 // Route::get('team/delete', [MsController::class, 'processQueueDeleteAllTeam']);
     Route::get('/remove/me', 'removeMeAllTeam');
+    Route::get('/remove/member/me', 'removeMeAll');
 });
+
+Route::get('adds/add/student', [AddDropController::class, 'addStudent']);
 
 Route::prefix('class')->controller(MainController::class)->group(function () {
     Route::get('/create', 'getClassCreate')->name('class/create');

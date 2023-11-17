@@ -8,6 +8,7 @@ use App\Jobs\CreateEventJob;
 use App\Jobs\CreateTeam;
 use App\Jobs\GetGroupMailAndChannelIdJob;
 use App\Jobs\PostMessageToTeam;
+use App\Jobs\RemoveMeJob;
 use App\Jobs\RemoveOwnerJob;
 use App\Models\Instructor;
 use App\Models\MjuClass;
@@ -168,6 +169,18 @@ class QueueController extends Controller
             $student_mail = 'sawanya_kck@mju.ac.th';
             $class_id = $row->class_id;
             RemoveOwnerJob::dispatch($team_id, $student_mail, $class_id);
+        }
+    }
+
+    public function removeMeAll()
+    {
+        $class = MjuClass::groupBy('class_id')->get();
+        // $class = MjuClass::where('class_id','=','337970')->get();
+        foreach ($class as $row) {
+            $team_id = $row->team_id;
+            $student_mail = 'sawanya_kck@mju.ac.th';
+            $class_id = $row->class_id;
+            RemoveMeJob::dispatch($team_id, $student_mail, $class_id);
         }
     }
 }

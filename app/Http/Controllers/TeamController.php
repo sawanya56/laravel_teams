@@ -416,7 +416,7 @@ class TeamController extends Controller
 
     public function removeOwner($team_id, $student_mail, $class_id)
     {
-    
+
         $token = parent::getAccessToken();
         $getOwnerUrl = "https://graph.microsoft.com/v1.0/groups/" . $team_id . "/owners";
         $response = Http::withToken($token)->get($getOwnerUrl);
@@ -439,7 +439,36 @@ class TeamController extends Controller
             }
         }
 
-       return false;
+        return false;
     }
 
+    public function removeMe($team_id , $student_mail , $class_id )
+    {
+        $token = parent::getAccessToken();
+        $getMembersUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members";
+        $response = Http::withToken($token)->get($getMembersUrl);
+        $members = $response->json()['value'] ?? [];
+        $memberId = null;
+        foreach ($members as $member) {
+            // echo "FOREACH \n";
+            if (strtolower($member['email']) === strtolower($student_mail)) {
+                echo "IF CASE";
+                $memberId = $member['id'];
+                $removeMemberUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . '/members/' . $memberId;
+                $response = Http::withToken($token)->delete($removeMemberUrl);
+                if ($response->successful()) {
+                    echo "removed \n";
+                    return true;
+                } else {
+                    echo "remove fail \n";
+                    // dd($response->json(),$removeMemberUrl);
+                    return false;
+                    
+                }
+                break;
+            }
+        }
+        // echo "END \n";
+        return false;
+    }
 }
