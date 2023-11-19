@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\AddJob;
 use App\Jobs\RemoveStudentJob;
 use App\Models\AddStudent;
+use App\Models\MjuClass;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -16,45 +17,48 @@ class AddDropController extends Controller
 
     public function addStudent()
     {
-        $class_all = DB::table($this->table_add)->groupBy('class_id')->get();
-        // $student_mail =  $class_all->student_mail;
-       
-        dd($class_all[0]->student_mail);
-        
-        foreach ($class_all as $class) {
+        $getClass = new MjuClass();
+        $class = $getClass->getAllClassGroupBy();
+        // dd($class);
 
-            $class_id = $class->class_id;
-            $class_detail = DB::table('class')->where('class_id', '=', $class_id)->first();
-            // DB::table('add')->update([ 'add_success' => 'success']);
-            if ($class_detail != null) {
-                $team_id = $class_detail->team_id;
+        foreach ($class as $row) {
+            $team_id = $row->team_id;
+          
+            if (count($row->getStudentAdd) != 0) {
+                // dd($row->getStudentAdd);
 
-                dd($team_id);
-                if ($team_id != null) {
-                    AddJob::dispatch($class_id, $team_id, $student_mail);
+                foreach ($row->getStudentAdd as $student) {
+                    $class_id = $student->class_id;
+                    $student_code = $student->student_mail;
+                    // dd($class_id);
+                    if ($student_code != null) {
+                        AddJob::dispatch($class_id, $team_id, $student_code);
+                    }
+
                 }
-            } else {
-                // echo "Team id not found :" . $class_id . "<br>";
-                // DB::table('empty_class')->insert(['class_id' => $class_id]);
+
             }
+
         }
+
+        
     }
 
-    public function addStudentToTeam($class_id, $team_id, $student_mail)
+    public function addStudentToTeam($class_id, $team_id, $student_code)
     {
         $model = new AddStudent();
 
-        if ($model->studentAddExist($class_id, $student_mail)) {
+        if ($model->studentAddExist($class_id, $student_code)) {
             return true;
         }
 
         $access_token = parent::getAccessToken();
         // $student_mail = 'mju' . $student_id . '@mju.ac.th';
         $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
-        $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
+        $student_code = "https://graph.microsoft.com/v1.0/users/" . $student_code;
 
         $response = Http::withToken($access_token)->post($url, [
-            "@odata.id" => $student_mail,
+            "@odata.id" => $student_code,
         ]);
 
         $student_status = "";
@@ -68,7 +72,7 @@ class AddDropController extends Controller
             $success = false;
         }
 
-        $model->updateStudentStatusAdd($student_mail, $class_id, $student_status);
+        $model->updateStudentStatusAdd($student_code, $class_id, $student_status);
         return $success;
     }
 

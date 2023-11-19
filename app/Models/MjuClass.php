@@ -53,4 +53,8 @@ class MjuClass extends Model
         return $this->hasMany(Enrollment::class,'class_id','class_id');
         
     }
+    public function getStudentAdd(){
+        return $this->hasMany(AddStudent::class,'class_id','class_id');
+        
+    }
 }

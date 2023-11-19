@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Http\Controllers\AddDropController;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -19,14 +18,14 @@ class AddJob implements ShouldQueue
      */
     private $class_id;
     private $team_id;
-    private $student_mail;
+    private $student_code;
 
-    public function __construct($class_id,$team_id,$student_mail)
+    public function __construct($class_id, $team_id, $student_code)
     {
         //
         $this->class_id = $class_id;
         $this->team_id = $team_id;
-        $this->student_mail = $student_mail;
+        $this->student_code = $student_code;
     }
 
     /**
@@ -36,7 +35,7 @@ class AddJob implements ShouldQueue
     {
         //
         $job = new AddDropController();
-        $job->addStudentToTeam($this->class_id,$this->team_id,$this->student_mail);
+        $job->addStudentToTeam($this->class_id, $this->team_id, $this->student_code);
 
     }
 }
