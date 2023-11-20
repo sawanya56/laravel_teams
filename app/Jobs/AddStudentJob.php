@@ -19,12 +19,12 @@ class AddStudentJob implements ShouldQueue
      * Create a new job instance.
      */
     private $class_id;
-    private $teams_id;
+    private $team_id;
     private $student_code;
-    public function __construct($class_id, $teams_id,$student_code)
+    public function __construct($class_id, $team_id,$student_code)
     {
         $this->class_id = $class_id;
-        $this->teams_id = $teams_id;
+        $this->team_id = $team_id;
         $this->student_code = $student_code;
     }
 
@@ -34,6 +34,6 @@ class AddStudentJob implements ShouldQueue
     public function handle(): void
     {
         $job = new TeamController();
-        $job->addStudent($this->class_id, $this->teams_id, $this->student_code);
+        $job->addStudent($this->class_id, $this->team_id, $this->student_code);
     }
 }

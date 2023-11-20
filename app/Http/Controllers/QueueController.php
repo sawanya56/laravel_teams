@@ -42,7 +42,6 @@ class QueueController extends Controller
                 echo $e->getMessage();
                 echo $class_id . "<br>";
             }
-
             // $this->createTeams($team_name, $section_id, $description);
         }
     }
@@ -82,18 +81,14 @@ class QueueController extends Controller
                 foreach ($row->getEnrollment as $student) {
                     $class_id = $student->class_id;
                     $student_code = $student->student_code;
-
+                    
                     if ($student_code != null) {
                         // dispatch(new AddStudentJob($class_id, $team_id, $student_code));
                         AddStudentJob::dispatch($class_id, $team_id, $student_code);
                     }
-
                 }
-
             }
-
         }
-
     }
 
     public function processQueueCreateEvent()

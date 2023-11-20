@@ -28,7 +28,7 @@ class TeamController extends Controller
     public function createTeams($team_name, $class_id, $description)
     {
         $access_token = parent::getAccessToken();
-        $owner_email = 'sawanya_kck@mju.ac.th';
+        $owner_email = 'admin.msteams@mju.ac.th';
 
         try {
             $response = Http::withToken($access_token)->post('https://graph.microsoft.com/v1.0/teams', [
@@ -84,35 +84,47 @@ class TeamController extends Controller
         return $success;
     }
 
-    public function addStudent($class_id, $team_id, $student_id)
+    public function addStudent($class_id, $team_id, $student_code)
     {
-        $model = new Enrollment();
-
-        if ($model->studentEnrollExist($class_id, $student_id)) {
-            return true;
+        try{
+            $model = new Enrollment();
+            Log::info("Add Student 1");
+            if ($model->studentEnrollExist($class_id, $student_code)) {
+                Log::info("Add Student Exist");
+                return true;
+            }
+           
+            $access_token = parent::getAccessToken();
+            $student_mail = 'MJU' . $student_code . '@mju.ac.th';
+            $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
+            $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
+    
+            $response = Http::withToken($access_token)->post($url, [
+                "@odata.id" => $student_mail,
+            ]);
+    
+            $student_status = "";
+            $success = true;
+            if ($response->successful()) {
+                // Success
+                Log::info("Add Student Success",[
+                    'student_mail' => $student_mail
+                ]);
+                $student_status = "success";
+            } else {
+                Log::error("Add Student Error",[
+                    'student_mail' => $student_mail
+                ]);
+                $error = $response->json();
+                $student_status = $error['error']['message'];
+                $success = false;
+            }
+    
+            $model->updateStudentStatus($student_code, $class_id, $student_status);
+            return $success;
+        }catch(Exception $e){
+            Log::error("Add Student",[$e->getMessage()]);
         }
-
-        $access_token = parent::getAccessToken();
-        $student_mail = 'mju' . $student_id . '@mju.ac.th';
-        $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
-        $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
-
-        $response = Http::withToken($access_token)->post($url, [
-            "@odata.id" => $student_mail,
-        ]);
-
-        $student_status = "";
-        $success = true;
-        if ($response->successful()) {
-            // Success
-            $student_status = "student_status";
-        } else {
-            $error = $response->json();
-            $student_status = $error['error']['message'];
-            $success = false;
-        }
-
-        $model->updateStudentStatus($student_id, $class_id, $student_status);
         return $success;
     }
 

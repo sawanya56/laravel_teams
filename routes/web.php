@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
  */
+Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
+
 Route::get('debugcode', [TeamController::class, 'removeMe']);
 
 Route::get('/home', [MainController::class, 'main'])->name('home');
