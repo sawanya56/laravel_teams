@@ -499,5 +499,6 @@ class TeamController extends Controller
 
         DB::table('tests')->insert( $data);
         Log::info("INSERT SUCCESS", $data);
+       
     }
 }

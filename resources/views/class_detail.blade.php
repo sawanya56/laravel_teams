@@ -188,7 +188,7 @@
         }
 
         // Attach the handleDelete function to the button click event
-        document.getElementById('btn_delete_team').addEventListener('click', handleDelete);
+        document.getElementById('btn_delete_team').addEventListener('click', handleDeleteStudent);
 
         document.getElementById('btn_add_student').addEventListener('click', function() {
             Swal.fire({

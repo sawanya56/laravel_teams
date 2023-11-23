@@ -66,10 +66,10 @@ Route::middleware('auth')->prefix('team')->controller(MainController::class)->gr
 Route::middleware('auth')->get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
 Auth::routes();
 
-Route::get('register',function(){
-    return redirect('login');
-})->name('register');
+// Route::get('register',function(){
+//     return redirect('login');
+// })->name('register');
 
-Route::post('register',function(){
-    return redirect('login');
-})->name('register');
+// Route::post('register',function(){
+//     return redirect('login');
+// })->name('register');
