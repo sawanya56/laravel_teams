@@ -21,6 +21,10 @@ Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'i
 Route::get('debugcode', [TeamController::class, 'removeMe']);
 
 Route::get('/home', [MainController::class, 'main'])->name('home');
+Route::get('/',function(){
+    return redirect('login');
+});
+
 
 Route::prefix('queue')->controller(QueueController::class)->group(function () {
     Route::get('/create/room', 'processQueueCreateTeam');
