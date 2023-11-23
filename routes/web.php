@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 
-Route::middleware('auth')->get('debugcode', [TeamController::class, 'removeMe']);
+Route::middleware('auth')->get('debugcode', [TeamController::class, 'testQueue']);
 
 Route::middleware('auth')->get('/home', [MainController::class, 'main'])->name('home');
 

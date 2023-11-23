@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\TestJob;
 use App\Models\Enrollment;
 use App\Models\Instructor;
 use App\Models\MjuClass;
@@ -482,5 +483,18 @@ class TeamController extends Controller
         }
         // echo "END \n";
         return false;
+    }
+
+    public function testQueue(){
+        TestJob::dispatch();
+    }
+
+
+    public function insertData(){
+        $now= new DateTime();
+        DB::table('tests')->insert([
+            'uid' => uniqid(),
+            'created_at' => $now->format('Y-m-d H:i:s')
+        ]);
     }
 }
