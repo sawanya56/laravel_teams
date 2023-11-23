@@ -492,9 +492,12 @@ class TeamController extends Controller
 
     public function insertData(){
         $now= new DateTime();
-        DB::table('tests')->insert([
+        $data = [
             'uid' => uniqid(),
             'created_at' => $now->format('Y-m-d H:i:s')
-        ]);
+        ];
+
+        DB::table('tests')->insert( $data);
+        Log::info("INSERT SUCCESS", $data);
     }
 }
