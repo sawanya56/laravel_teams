@@ -25,6 +25,12 @@ Route::middleware('auth')->get('/home', [MainController::class, 'main'])->name('
 Route::get('/',function(){
     return redirect('login');
 });
+Route::get('/register',function(){
+    return redirect('login');
+});
+Route::post('/register',function(){
+    return redirect('login');
+});
 
 
 Route::middleware('auth')->prefix('queue')->controller(QueueController::class)->group(function () {
