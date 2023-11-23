@@ -25,12 +25,6 @@ Route::middleware('auth')->get('/home', [MainController::class, 'main'])->name('
 Route::get('/',function(){
     return redirect('login');
 });
-Route::get('/register',function(){
-    return redirect('login');
-});
-Route::post('/register',function(){
-    return redirect('login');
-});
 
 
 Route::middleware('auth')->prefix('queue')->controller(QueueController::class)->group(function () {
@@ -71,3 +65,11 @@ Route::middleware('auth')->prefix('team')->controller(MainController::class)->gr
 
 Route::middleware('auth')->get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
 Auth::routes();
+
+Route::get('register',function(){
+    return redirect('login');
+})->name('register');
+
+Route::post('register',function(){
+    return redirect('login');
+})->name('register');
