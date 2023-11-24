@@ -41,7 +41,7 @@ Route::middleware('auth')->prefix('queue')->controller(QueueController::class)->
     Route::get('/remove/member/me', 'removeMeAll');
 });
 
-Route::middleware('auth')->get('adds/add/student', [AddDropController::class, 'addStudent']);
+Route::middleware('auth')->get('adds/add/student', [AddDropController::class, 'addStudentAdds']);
 Route::middleware('auth')->get('drops/remove/student', [AddDropController::class, 'dropStudent']);
 
 
