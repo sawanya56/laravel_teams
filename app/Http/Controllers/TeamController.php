@@ -506,6 +506,7 @@ class TeamController extends Controller
     {
         $token = parent::getAccessToken();
         $class = DB::table('class')->where('class_id', '=', $class_id)->first();
+        Log::info("DROP Student Class 1");
         if ($class == null) {
             DB::table('drops')->where('class_id', '=', $class_id)->update([
                 'remove_success' => "class id null",
@@ -520,7 +521,7 @@ class TeamController extends Controller
         $memberId = null;
 
         $students = DB::table('drops')->where('class_id', '=', $class_id)->whereNull('remove_success')->get();
-
+        
         foreach ($students as $student) {
             $student_mail = $student->student_mail;
             $id = $student->id;
@@ -532,11 +533,18 @@ class TeamController extends Controller
                     if ($response->status() === 204) {
                         DB::table('drops')->where('id', '=', $id)->update([
                             'remove_success' => "success",
+                            
+                        ]);
+                        Log::info("DROP Student success",[
+                            'student_mail' => $student_mail
                         ]);
                         echo $team_id . ":" . $student_mail . "\n";
                     } else {
                         DB::table('drops')->where('id', '=', $id)->update([
                             'remove_success' => json_encode($response->json()),
+                        ]);
+                        Log::error("DROP Student Error",[
+                            'student_mail' => $student_mail
                         ]);
                     }
                 }

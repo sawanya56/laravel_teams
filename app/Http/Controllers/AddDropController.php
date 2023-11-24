@@ -106,17 +106,13 @@ class AddDropController extends Controller
                     $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
                     $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
                     if ($response->status() === 204) {
-                        log::info("Add Student Success", [
-                            'student_mail' => $student_mail,
-                        ]);
+                       
                         DB::table('adds')->where('id', '=', $id)->update([
                             'add_success' => "success",
                         ]);
                         echo $team_id . ":" . $student_mail . "\n";
                     } else {
-                        log::error("Add Student Error", [
-                            'student_mail' => $student_mail,
-                        ]);
+                        
                         DB::table('adds')->where('id', '=', $id)->update([
                             'add_success' => json_encode($response->json()),
                         ]);
@@ -125,13 +121,21 @@ class AddDropController extends Controller
             }
         }
     }
-    
+
     public function dropStudent()
     {
         $class_list = DB::table($this->table_drop)->whereNull('remove_success')->groupBy('class_id')->get();
         foreach ($class_list as $class) {
             // dispatch(new RemoveStudentJob($class->class_id));
             RemoveStudentJob::dispatch($class->class_id);
+        }
+    }
+
+    public function addStudentAdds(){
+        $class_list = DB::table($this->table_add)->whereNull('add_success')->groupBy('class_id')->get();
+        foreach ($class_list as $class) {
+            // dispatch(new RemoveStudentJob($class->class_id));
+            AddJob::dispatch($class->class_id);
         }
     }
 }
