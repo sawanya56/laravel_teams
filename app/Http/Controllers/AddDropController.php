@@ -30,10 +30,10 @@ class AddDropController extends Controller
 
                 foreach ($row->getStudentAdd as $student) {
                     $class_id = $student->class_id;
-                    $student_code = $student->student_mail;
+                    $student_mail = $student->student_mail;
                     // dd($class_id);
-                    if ($student_code != null) {
-                        AddJob::dispatch($class_id, $team_id, $student_code);
+                    if ($student_mail != null) {
+                        AddJob::dispatch($class_id, $team_id, $student_mail);
                     }
 
                 }
@@ -44,39 +44,48 @@ class AddDropController extends Controller
 
     }
 
-    public function addStudentToTeam($class_id, $team_id, $student_code)
+    public function addStudentToTeam($class_id, $team_id, $student_mail)
     {
         $model = new AddStudent();
 
-        if ($model->studentAddExist($class_id, $student_code)) {
+        if ($model->studentAddExist($class_id, $student_mail)) {
             return true;
         }
 
         $access_token = parent::getAccessToken();
         // $student_mail = 'mju' . $student_id . '@mju.ac.th';
         $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
-        $student_code = "https://graph.microsoft.com/v1.0/users/" . $student_code;
+        $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
 
         $response = Http::withToken($access_token)->post($url, [
-            "@odata.id" => $student_code,
+            "@odata.id" => $student_mail,
         ]);
 
         $student_status = "";
         $success = true;
         if ($response->successful()) {
             // Success
+            Log::info("ADD Student success",[
+                'student_mail' => $student_mail
+                
+            ]);
             $student_status = "student_status";
         } else {
+            
             $error = $response->json();
             $student_status = $error['error']['message'];
             $success = false;
+            Log::error("ADD Student error",[
+                'student_mail' => $student_mail,
+                'error' => $student_status
+            ]);
         }
 
-        $model->updateStudentStatusAdd($student_code, $class_id, $student_status);
+        $model->updateStudentStatusAdd($student_mail, $class_id, $student_status);
         return $success;
     }
 
-    public function addStudentFromTeamByAdds($class_id)
+    public function addStudentFromTeamByAdds($class_id='341244',)
     {
         $access_token = parent::getAccessToken();
         $class = DB::table('class')->where('class_id', '=', $class_id)->first();

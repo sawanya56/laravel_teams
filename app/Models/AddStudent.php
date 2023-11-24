@@ -16,11 +16,11 @@ class AddStudent extends Model
         'add_success'
     ];
 
-    public function updateStudentStatusAdd($student_code, $class_id, $student_status)
+    public function updateStudentStatusAdd($student_mail, $class_id, $student_status)
     {
         AddStudent::where([
             ['class_id', '=', $class_id],
-            ['student_code', '=', $student_code]
+            ['student_code', '=', $student_mail]
         ])->update([
             'add_success' => $student_status
         ]);
