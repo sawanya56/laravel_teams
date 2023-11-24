@@ -106,6 +106,10 @@ class AddDropController extends Controller
                     // $response = Http::withToken($access_token)->delete($removeMemberUrl);
                     $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
                     $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
+                    $response = Http::withToken($access_token)->post($url, [
+                        "@odata.id" => $student_mail,
+                    ]);
+
                     if ($response->status() === 204) {
                        
                         DB::table('adds')->where('id', '=', $id)->update([
