@@ -53,7 +53,6 @@ class AddDropController extends Controller
         }
 
         $access_token = parent::getAccessToken();
-        // $student_mail = 'mju' . $student_id . '@mju.ac.th';
         $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
         $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
 
@@ -64,12 +63,11 @@ class AddDropController extends Controller
         $student_status = "";
         $success = true;
         if ($response->successful()) {
-            // Success
+            
+            $student_status = "success";
             Log::info("ADD Student success",[
                 'student_mail' => $student_mail
-                
             ]);
-            $student_status = "student_status";
         } else {
             
             $error = $response->json();
