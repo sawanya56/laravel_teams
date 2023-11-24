@@ -54,16 +54,17 @@ class AddDropController extends Controller
 
         $access_token = parent::getAccessToken();
         $url = 'https://graph.microsoft.com/v1.0/groups/' . $team_id . '/members/$ref';
-        $student_mail = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
+        
+        $student_mail_add = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
 
         $response = Http::withToken($access_token)->post($url, [
-            "@odata.id" => $student_mail,
+            "@odata.id" => $student_mail_add,
         ]);
 
         $student_status = "";
         $success = true;
         if ($response->successful()) {
-            
+
             $student_status = "success";
             Log::info("ADD Student success",[
                 'student_mail' => $student_mail
