@@ -80,6 +80,7 @@ class AddDropController extends Controller
     {
         $access_token = parent::getAccessToken();
         $class = DB::table('class')->where('class_id', '=', $class_id)->first();
+        Log::info("ADD Student Class 1");
         if ($class == null) {
             DB::table('adds')->where('class_id', '=', $class_id)->update([
                 'add_success' => "class id null",
@@ -110,11 +111,18 @@ class AddDropController extends Controller
                         DB::table('adds')->where('id', '=', $id)->update([
                             'add_success' => "success",
                         ]);
+                        Log::info("ADD Student success",[
+                            'student_mail' => $student_mail
+                        ]);
+
                         echo $team_id . ":" . $student_mail . "\n";
                     } else {
                         
                         DB::table('adds')->where('id', '=', $id)->update([
                             'add_success' => json_encode($response->json()),
+                        ]);
+                        Log::error("ADD Student fail",[
+                            'student_mail' => $student_mail
                         ]);
                     }
                 }
