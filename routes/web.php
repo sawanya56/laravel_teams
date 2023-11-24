@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AddDropController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\MsController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,8 @@ Route::middleware('auth')->prefix('queue')->controller(QueueController::class)->
 });
 
 Route::middleware('auth')->get('adds/add/student', [AddDropController::class, 'addStudent']);
+Route::middleware('auth')->get('drops/remove/student', [AddDropController::class, 'dropStudent']);
+
 
 Route::middleware('auth')->prefix('class')->controller(MainController::class)->group(function () {
     Route::get('/create', 'getClassCreate')->name('class/create');

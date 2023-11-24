@@ -501,4 +501,46 @@ class TeamController extends Controller
         Log::info("INSERT SUCCESS", $data);
        
     }
+
+    public function removeStudentFromTeam($class_id)
+    {
+        $token = parent::getAccessToken();
+        $class = DB::table('class')->where('class_id', '=', $class_id)->first();
+        if ($class == null) {
+            DB::table('drops')->where('class_id', '=', $class_id)->update([
+                'remove_success' => "class id null",
+            ]);
+            return 0;
+        }
+        
+        $team_id = $class->team_id;
+        $getMembersUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members";
+        $response = Http::withToken($token)->get($getMembersUrl);
+        $members = $response->json()['value'] ?? [];
+        $memberId = null;
+
+        $students = DB::table('drops')->where('class_id', '=', $class_id)->whereNull('remove_success')->get();
+
+        foreach ($students as $student) {
+            $student_mail = $student->student_mail;
+            $id = $student->id;
+            foreach ($members as $member) {
+                if (strtolower($member['email']) === strtolower($student_mail)) {
+                    $memberId = $member['id'];
+                    $removeMemberUrl = "https://graph.microsoft.com/v1.0/teams/" . $team_id . "/members/" . $memberId;
+                    $response = Http::withToken($token)->delete($removeMemberUrl);
+                    if ($response->status() === 204) {
+                        DB::table('drops')->where('id', '=', $id)->update([
+                            'remove_success' => "success",
+                        ]);
+                        echo $team_id . ":" . $student_mail . "\n";
+                    } else {
+                        DB::table('drops')->where('id', '=', $id)->update([
+                            'remove_success' => json_encode($response->json()),
+                        ]);
+                    }
+                }
+            }
+        }
+    }
 }

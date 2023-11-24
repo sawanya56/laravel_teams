@@ -630,7 +630,7 @@ class MsController extends Controller
 
     public function removeStudentFromTeam($class_id)
     {
-        $token = $this->getAccessTokenDatabase();
+        $token = parent::getAccessTokenDatabase();
         $class = DB::table('class')->where('class_id', '=', $class_id)->first();
         if ($class == null) {
             DB::table('drops')->where('class_id', '=', $class_id)->update([
