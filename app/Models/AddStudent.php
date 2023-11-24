@@ -20,7 +20,7 @@ class AddStudent extends Model
     {
         AddStudent::where([
             ['class_id', '=', $class_id],
-            ['student_code', '=', $student_mail]
+            ['student_mail', '=', $student_mail]
         ])->update([
             'add_success' => $student_status
         ]);
