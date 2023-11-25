@@ -250,16 +250,16 @@ class MainController extends Controller
     {
         $students = DB::table('students')->whereNull('add_success')->groupBy('class_id')->get();
 
-        foreach ($students as $student) {
-            $student_details = DB::table('students')->whereNull('add_success')->where('class_id', '=', $student->class_id)->get();
-            $class_detail = DB::table('class')->where('class_id', '=', $student->class_id)->first();
 
-            if ($class_detail) {
+        foreach ($students as $student) {
+            $student_mail = $student->student_mail;
+            $class_id = $student->class_id;
+
+            $class_detail = DB::table('class')->where('class_id', '=', $class_id)->first();
+
+            if ($class_detail != null) {
                 $team_id = $class_detail->team_id;
 
-                foreach ($student_details as $student_detail) {
-                    $student_mail = $student_detail->student_mail;
-                    $class_id = $student_detail->class_id;
                     // dd($student_mail);
                     if ($student_mail != null) {
                         AddStudentKasetJob::dispatch($class_id, $team_id, $student_mail);
