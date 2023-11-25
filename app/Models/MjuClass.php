@@ -57,4 +57,8 @@ class MjuClass extends Model
         return $this->hasMany(AddStudent::class,'class_id','class_id');
         
     }
+    public function getStudentAddKaset(){
+        return $this->hasMany(StudentKaset::class,'class_id','class_id');
+        
+    }
 }

@@ -84,7 +84,7 @@ class AddDropController extends Controller
         return $success;
     }
 
-    public function addStudentFromTeamByAdds($class_id='341244',)
+    public function addStudentFromTeamByAdds($class_id)
     {
         $access_token = parent::getAccessToken();
         $class = DB::table('class')->where('class_id', '=', $class_id)->first();

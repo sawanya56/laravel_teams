@@ -41,6 +41,7 @@ Route::middleware('auth')->prefix('queue')->controller(QueueController::class)->
     Route::get('/remove/member/me', 'removeMeAll');
 });
 
+//AddDrop
 Route::middleware('auth')->get('adds/add/student', [AddDropController::class, 'addStudent']);
 Route::middleware('auth')->get('drops/remove/student', [AddDropController::class, 'dropStudent']);
 
@@ -55,6 +56,7 @@ Route::middleware('auth')->prefix('class')->controller(MainController::class)->g
 
     Route::get('/detail/{id}', 'getClassDetail');
     Route::post('/add/owner', 'addOwner');
+    Route::get('/kaset/student', 'AddStudentForKaset');
 });
 
 Route::middleware('auth')->prefix('team')->controller(MainController::class)->group(function () {
