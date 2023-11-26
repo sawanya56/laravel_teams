@@ -248,27 +248,20 @@ class MainController extends Controller
 
     public function AddStudentForKaset()
     {
-        $students = DB::table('students')->whereNull('add_success')->groupBy('class_id')->get();
-
+        $students = DB::table('students')->whereNull('add_success')->get();
 
         foreach ($students as $student) {
             $student_mail = $student->student_mail;
             $class_id = $student->class_id;
+            $team_id = $student->team_id;
 
-            $class_detail = DB::table('class')->where('class_id', '=', $class_id)->first();
-
-            if ($class_detail != null) {
-                $team_id = $class_detail->team_id;
-
-                    // dd($student_mail);
-                    if ($student_mail != null) {
-                        AddStudentKasetJob::dispatch($class_id, $team_id, $student_mail);
-                    }
-                
+            if ($student_mail != null) {
+                AddStudentKasetJob::dispatch($class_id, $team_id, $student_mail);
             }
+
+          
         }
     }
-
 
     public function addStudentKasetToTeam($class_id, $team_id, $student_mail)
     {
@@ -279,8 +272,8 @@ class MainController extends Controller
         }
 
         $access_token = parent::getAccessToken();
-        $url = "https://graph.microsoft.com/v1.0/groups/{$team_id}/members/\$ref";
-        $student_mail_add = "https://graph.microsoft.com/v1.0/users/{$student_mail}";
+        $url = "https://graph.microsoft.com/v1.0/groups/" . $team_id . '/members/$ref';
+        $student_mail_add = "https://graph.microsoft.com/v1.0/users/" . $student_mail;
 
         $payload = [
             "@odata.id" => $student_mail_add,
