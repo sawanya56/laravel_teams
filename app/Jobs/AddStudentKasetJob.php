@@ -25,7 +25,7 @@ class AddStudentKasetJob implements ShouldQueue
     {
         $this->class_id = $class_id;
         $this->team_id = $team_id;
-        $this->student_code = $student_mail;
+        $this->student_mail = $student_mail;
     }
 
     /**

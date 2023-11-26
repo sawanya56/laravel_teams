@@ -256,7 +256,9 @@ class MainController extends Controller
             $team_id = $student->team_id;
 
             if ($student_mail != null) {
+                Log::warning('student-kaset');
                 AddStudentKasetJob::dispatch($class_id, $team_id, $student_mail);
+                Log::warning('student-kaset Job');
             }
 
           
