@@ -264,10 +264,11 @@ class MainController extends Controller
                     if ($student_mail != null) {
                         AddStudentKasetJob::dispatch($class_id, $team_id, $student_mail);
                     }
-                }
+                
             }
         }
     }
+
 
     public function addStudentKasetToTeam($class_id, $team_id, $student_mail)
     {
