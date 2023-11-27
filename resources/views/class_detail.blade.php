@@ -68,7 +68,7 @@
                                     <input type="hidden" name="class_id" value="{{ $class_detail->class_id }}">
                                 </div>
                                 <div class="form-group col-md-2">
-                                    <button type="submit" class="btn btn-primary">Add Instructor</button>
+                                    <button type="submit" class="btn btn-primary" id="btn_add_ins">Add Instructor</button>
                                 </div>
                             </div>
                         </form>
@@ -190,11 +190,27 @@
         // Attach the handleDelete function to the button click event
         document.getElementById('btn_delete_team').addEventListener('click', handleDeleteStudent);
 
+        document.getElementById('btn_add_ins').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Add Instructor Success?',
+                icon: 'success',
+
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, submit the form
+                    document.getElementById('addInsForm').submit();
+
+                    // Show success notification
+                    Swal.fire('Saved!', '', 'success');
+                    $('[data-dismiss="modal"]').trigger('click');
+                }
+            });
+        });
+
         document.getElementById('btn_add_student').addEventListener('click', function() {
             Swal.fire({
                 title: 'Add Student Success?',
                 icon: 'success',
-                showCancelButton: true,
 
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -207,7 +223,6 @@
                 }
             });
         });
-
 
         document.getElementById('btn_delete_student').addEventListener('click', function() {
             Swal.fire({
