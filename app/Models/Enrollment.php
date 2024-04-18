@@ -43,7 +43,7 @@ class Enrollment extends Model
         $student = Enrollment::where([
             ['class_id', '=', $class_id],
             ['student_code', '=', $student_code],
-            // ['add_success', '=', "success"]
+            ['add_success', '=', "success"]
         ])->first();
 
         if ($student != null) {

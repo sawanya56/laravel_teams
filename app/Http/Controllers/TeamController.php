@@ -89,9 +89,8 @@ class TeamController extends Controller
     {
         try{
             $model = new Enrollment();
-            Log::info("Add Student 1");
             if ($model->studentEnrollExist($class_id, $student_code)) {
-                Log::info("Add Student Exist");
+                Log::info("Add Student Exist $student_code in class $class_id");
                 return true;
             }
            
